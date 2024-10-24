@@ -1,4 +1,4 @@
-defmodule FusionWeb.Gettext do
+defmodule Fusion.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
