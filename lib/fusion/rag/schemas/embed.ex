@@ -1,16 +1,15 @@
-defmodule Fusion.Chat.Embed do
+defmodule Fusion.RAG.Embed do
   @moduledoc false
 
   use FusionMacros, :schema
 
-  schema "embeds" do
-    field(:title, :string)
-    field(:url, :string)
-    field(:content, :string)
-
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  schema "rag_embeds" do
     field(:tokens, :integer)
-
     field(:vectors, Pgvector.Ecto.Vector)
+
+    belongs_to(:model, Fusion.RAG.Model, type: Ecto.UUID)
+    belongs_to(:content, Fusion.RAG.Content, type: Ecto.UUID)
 
     timestamps(type: :utc_datetime)
   end
@@ -23,10 +22,10 @@ defmodule Fusion.Chat.Embed do
     struct
     |> cast(
       attrs,
-      ~w(title url content tokens vectors)a
+      ~w(tokens vectors model_id content_id)a
     )
     |> validate_required(
-      ~w(title url content tokens)a
+      ~w(tokens vectors model_id content_id)a
     )
   end
 end

@@ -1,9 +1,42 @@
-defmodule Fusion.Chat.EmbedLib do
+defmodule Fusion.RAG.EmbedLib do
   @moduledoc """
   Library of embed related functions.
   """
   use FusionMacros, :library
-  alias Fusion.Chat.{Embed, EmbedQueries}
+  alias Fusion.RAG.{Embed, EmbedQueries, Content, Model}
+
+  @doc """
+  Given a user prompt, a model and a client return a list of vectors
+  """
+  @spec get_nearest_embed_vectors(String.t(), Model.t(), Ollama.client()) :: list()
+  def get_nearest_embed_vectors(user_prompt, %Model{} = model, client) do
+    # Call Ollama to get the embed vectors for this prompt
+    {:ok, response} = Ollama.embed(client, model: model.name, input: user_prompt)
+    [response_vectors] = response["embeddings"]
+
+    # Now get the closest embed
+    closest_embed = EmbedQueries.embed_query(
+      where: [model_id: model.id],
+      order_by: [{"Vectors", response_vectors}],
+      limit: 1
+    )
+    |> Fusion.Repo.one()
+
+    # Return the vectors of the closest embed
+    closest_embed.vectors |> Pgvector.to_list()
+  end
+
+  @spec find_non_created_embeds([Content.id()], Model.id()) :: [Content.id()]
+  def find_non_created_embeds(content_ids, model_id) when is_list(content_ids) do
+    existing_embed_content_ids = list_embeds(
+      where: [model_id: model_id, content_id: content_ids],
+      select: [:content_id]
+    )
+    |> Enum.map(fn %{content_id: id} -> id end)
+
+    content_ids
+    |> Enum.reject(fn existing_id -> Enum.member?(existing_embed_content_ids, existing_id) end)
+  end
 
   @doc """
   Returns the list of embeds.
@@ -98,7 +131,7 @@ defmodule Fusion.Chat.EmbedLib do
   """
   @spec update_embed(Embed.t(), map) :: {:ok, Embed.t()} | {:error, Ecto.Changeset.t()}
   def update_embed(%Embed{} = embed, attrs) do
-    Embed.changeset(embed, attrs, :full)
+    Embed.changeset(embed, attrs)
     |> Fusion.Repo.update()
   end
 
