@@ -38,6 +38,18 @@ defmodule FusionWeb.Router do
     get "/readme", PageController, :readme
   end
 
+  scope "/compare", FusionWeb do
+    pipe_through [:browser]
+
+    live_session :compare_index,
+      on_mount: [
+        {FusionWeb.UserAuth, :ensure_authenticated}
+      ] do
+      live "/", CompareLive.Home
+      live "/:id", CompareLive.Show
+    end
+  end
+
   scope "/admin", FusionWeb.Admin do
     pipe_through [:browser]
 

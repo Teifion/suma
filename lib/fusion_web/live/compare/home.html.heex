@@ -1,0 +1,13 @@
+<div style="height: 15px;">&nbsp;</div>
+
+<div class="row">
+  <.live_component
+    :if={assigns[:completion]}
+    module={FusionWeb.RAG.CompletionComponent}
+    id={:completion_component}
+    completion={@completion}
+    title="LLM Options"
+    action={:new}
+    content_name={assigns[:content_name]}
+  />
+</div>

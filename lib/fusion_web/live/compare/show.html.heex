@@ -1,0 +1,42 @@
+<div style="height: 15px;">&nbsp;</div>
+
+<div class="row">
+  <.live_component
+    :if={assigns[:completion] && assigns[:key_difference]}
+    module={FusionWeb.RAG.CompletionComponent}
+    id={:completion_component}
+    completion={@completion}
+    title="LLM Options"
+    action={:edit}
+  />
+</div>
+
+<div class="row mt-4">
+  <form action={"#"} phx-change="update-key_difference" method="post" class="">
+    <div class="row">
+      <div class="col">
+        <%= if is_nil(assigns[:key_difference]) do %>
+          <h4>Select a key difference to compare</h4>
+        <% end %>
+
+        <label for="key-difference-update-select" class="control-label">Key difference:</label>
+        <.input id="key-difference-update-select" type="select" name="key_difference" options={["Pick a field" | @key_fields]} value={assigns[:key_difference]} />
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="row mt-4" :if={assigns[:key_difference]}>
+  <div class="col" :for={{value, idx} <- Enum.with_index(@variables)}>
+    <%= value %>
+    <% response = assigns[:responses][value] %>
+
+    <%= if response do %>
+      <textarea id={"textarea-#{idx}"} rows="8" class="form-control"><%=
+        response["response"]
+      %></textarea>
+    <% else %>
+      Awaiting...
+    <% end %>
+  </div>
+</div>

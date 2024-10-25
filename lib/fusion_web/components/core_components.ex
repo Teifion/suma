@@ -249,12 +249,23 @@ defmodule FusionWeb.CoreComponents do
 
   attr :errors, :list, default: []
   attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
+  attr :radio_value, :string, doc: "the value of a given radio button"
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
+
+  def input(%{field: %Phoenix.HTML.FormField{} = field, type: "radio"} = assigns) do
+    assigns
+    |> assign(field: nil, id: assigns.id || field.id)
+    |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
+    |> assign(:checked, field.value == assigns[:radio_value])
+    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
+    |> assign_new(:value, fn -> field.value end)
+    |> input()
+  end
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
@@ -290,6 +301,46 @@ defmodule FusionWeb.CoreComponents do
     </div>
     """
   end
+
+  def input(%{type: "radio", value: value} = assigns) do
+    ~H"""
+    <div class="form-radio d-inline-block">
+      <input
+        name={@name}
+        id={@id}
+        class="form-radio-input"
+        type="radio"
+        value={@value}
+        checked={@checked}
+        {@rest}
+      />
+      <label class="form-check-label" for={@id}>
+        <strong><%= @label %></strong><%= assigns[:text] %>
+        <%= if assigns[:description] do %>
+          &nbsp;<%= assigns[:description] %>
+        <% end %>
+      </label>
+    </div>
+    """
+  end
+
+  # def input(%{type: "radio"} = assigns) do
+  #   ~H"""
+  #   <div phx-feedback-for={@name} class="form-radio d-inline-block">
+  #     <.label for={@id}><%= @label %></.label>
+  #     <input
+  #       type="radio"
+  #       id={@id}
+  #       name={@name}
+  #       value={@value}
+  #       checked={@checked}
+  #       class="form-radio-input"
+  #       {@rest}
+  #     />
+  #     <.error :for={msg <- @errors}><%= msg %></.error>
+  #   </div>
+  #   """
+  # end
 
   def input(%{type: "select"} = assigns) do
     ~H"""

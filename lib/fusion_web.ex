@@ -58,6 +58,13 @@ defmodule FusionWeb do
     end
   end
 
+  def server do
+    quote do
+      def ok(socket), do: {:ok, socket}
+      def noreply(socket), do: {:noreply, socket}
+    end
+  end
+
   def queries do
     quote do
       import Ecto.Query, warn: false
@@ -84,8 +91,7 @@ defmodule FusionWeb do
       alias Fusion.Helper.StylingHelper
 
       defguard is_connected?(socket) when socket.transport_pid != nil
-      def ok(socket), do: {:ok, socket}
-      def noreply(socket), do: {:noreply, socket}
+      unquote(server())
       unquote(html_helpers())
     end
   end
@@ -109,6 +115,7 @@ defmodule FusionWeb do
       import Fusion.Helper.StringHelper, only: [format_number: 1]
 
       unquote(html_helpers())
+      unquote(server())
     end
   end
 

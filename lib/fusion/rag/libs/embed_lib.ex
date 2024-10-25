@@ -8,8 +8,8 @@ defmodule Fusion.RAG.EmbedLib do
   @doc """
   Given a user prompt, a model and a client return a list of vectors
   """
-  @spec get_nearest_embed_vectors(String.t(), Model.t(), Ollama.client()) :: list()
-  def get_nearest_embed_vectors(user_prompt, %Model{} = model, client) do
+  @spec get_nearest_embed(String.t(), Model.t(), Ollama.client()) :: Embed.t()
+  def get_nearest_embed(user_prompt, %Model{} = model, client) do
     # Call Ollama to get the embed vectors for this prompt
     {:ok, response} = Ollama.embed(client, model: model.name, input: user_prompt)
     [response_vectors] = response["embeddings"]
@@ -21,9 +21,13 @@ defmodule Fusion.RAG.EmbedLib do
       limit: 1
     )
     |> Fusion.Repo.one()
+  end
 
-    # Return the vectors of the closest embed
-    closest_embed.vectors |> Pgvector.to_list()
+  @spec get_nearest_embed_vectors(String.t(), Model.t(), Ollama.client()) :: list()
+  def get_nearest_embed_vectors(user_prompt, %Model{} = model, client) do
+    get_nearest_embed(user_prompt, model, client)
+    |> Map.get(:vectors)
+    |> Pgvector.to_list()
   end
 
   @spec find_non_created_embeds([Content.id()], Model.id()) :: [Content.id()]
