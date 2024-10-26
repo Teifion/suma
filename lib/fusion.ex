@@ -23,7 +23,7 @@ defmodule Fusion do
     Ecto.UUID.generate()
   end
 
-  def testrun() do
+  def dummy_embeds() do
     content_param_list = [
       "Llamas are members of the camelid family meaning they're pretty closely related to vicuñas and camels",
       "Llamas were first domesticated and used as pack animals 4,000 to 5,000 years ago in the Peruvian highlands",
@@ -45,6 +45,11 @@ defmodule Fusion do
     # Create the embeds for a given model
     model_name = "llama3.2"
     batch_create_embeds(model_name, contents)
+  end
+
+  def testrun() do
+    model_name = "llama3.2"
+    dummy_embeds()
 
     prompt = "What animals are llamas related to?"
     model = RAG.ModelLib.get_model_by_name!(model_name)

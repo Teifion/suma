@@ -40,6 +40,28 @@ defmodule Fusion.RAG.ModelLib do
   end
 
   @doc """
+  Returns the list of models.
+
+  ## Examples
+
+      iex> list_models()
+      [%Model{}, ...]
+
+  """
+  @spec list_active_model_names() :: [Model.name()]
+  def list_active_model_names() do
+    ModelQueries.model_query(
+      where: [
+        active?: true
+      ],
+      select: [:name],
+      order_by: ["Name (A-Z)"]
+    )
+    |> Repo.all()
+    |> Enum.map(fn %{name: name} -> name end)
+  end
+
+  @doc """
   Gets a single model.
 
   Raises `Ecto.NoResultsError` if the Model does not exist.

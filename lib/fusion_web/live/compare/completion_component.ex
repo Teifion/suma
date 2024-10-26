@@ -19,7 +19,7 @@ defmodule FusionWeb.RAG.CompletionComponent do
             <br />
 
             <label for="completion_model_name" class="control-label">Model name:</label>
-            <.input field={@form[:model_name]} options={["llama3.2"]} type="select" phx-debounce="500" />
+            <.input field={@form[:model_name]} options={@model_names} type="select" phx-debounce="500" />
             <br />
           </div>
 

@@ -7,18 +7,20 @@ defmodule FusionWeb.CompareLive.Home do
   @impl true
   def mount(_params, _session, socket) when is_connected?(socket) do
     completion = struct(%Completion{}, default_completion_opts())
+    model_names = ModelLib.list_active_model_names()
 
     socket
+    |> assign(:model_names, model_names)
     |> assign(:client, Ollama.init())
     |> assign(:embed_name, nil)
     |> assign(:completion, completion)
-    # |> update_nearest_embed
     |> assign(:site_menu_active, "compare")
     |> ok
   end
 
   def mount(_params, _session, socket) do
     socket
+    |> assign(:model_names, [])
     |> ok
   end
 
@@ -45,7 +47,7 @@ defmodule FusionWeb.CompareLive.Home do
 
   defp default_completion_opts() do
     %{
-      model_name: "llama3.2",
+      model_name: "llama3.2:latest",
       user_prompt: "What is the best type of Triangle?",
       system_prompt: RAG.default_system_prompt()
     }

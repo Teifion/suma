@@ -1,7 +1,7 @@
 defmodule FusionWeb.CompareLive.Show do
   use FusionWeb, :live_view
 
-  alias Fusion.RAG.{Completion, ComparisonLib}
+  alias Fusion.RAG.{Completion, ComparisonLib, ModelLib}
 
   @impl true
   def mount(%{"id" => id}, _session, socket) when is_connected?(socket) do
@@ -14,8 +14,10 @@ defmodule FusionWeb.CompareLive.Show do
 
       comparison_state ->
         :ok = Fusion.subscribe(ComparisonLib.comparison_topic(id))
+    model_names = ModelLib.list_active_model_names()
 
         socket
+          |> assign(:model_names, model_names)
           |> assign(:id, id)
           |> assign(:completion, comparison_state.completion)
           |> assign(:responses, comparison_state.responses)

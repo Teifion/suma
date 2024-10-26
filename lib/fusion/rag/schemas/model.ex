@@ -6,6 +6,8 @@ defmodule Fusion.RAG.Model do
   @primary_key {:id, Ecto.UUID, autogenerate: true}
   schema "rag_models" do
     field(:name, :string)
+
+    # Active means it is both installed and enabled
     field(:active?, :boolean)
 
     field(:enabled?, :boolean)
@@ -26,7 +28,7 @@ defmodule Fusion.RAG.Model do
   @spec changeset(map()) :: Ecto.Changeset.t()
   @spec changeset(map(), map()) :: Ecto.Changeset.t()
   def changeset(struct, attrs \\ %{}) do
-    c = struct
+    struct
     |> cast(
       attrs,
       ~w(name active? enabled? installed? details size ollama_modified_at)a

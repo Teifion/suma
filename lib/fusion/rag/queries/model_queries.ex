@@ -54,6 +54,12 @@ defmodule Fusion.RAG.ModelQueries do
     )
   end
 
+  def _where(query, :active?, active?) do
+    from(models in query,
+      where: models.active? == ^active?
+    )
+  end
+
   @spec do_order_by(Ecto.Query.t(), list | nil) :: Ecto.Query.t()
   defp do_order_by(query, nil), do: query
 
