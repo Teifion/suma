@@ -1,4 +1,4 @@
-defmodule FusionWeb.Admin.Models.IndexLive do
+defmodule FusionWeb.Models.IndexLive do
   @moduledoc false
   use FusionWeb, :live_view
 

@@ -1,4 +1,4 @@
-defmodule FusionWeb.Admin.Models.ShowLive do
+defmodule FusionWeb.Models.ShowLive do
   @moduledoc false
   use FusionWeb, :live_view
 

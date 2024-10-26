@@ -132,23 +132,16 @@ defmodule Fusion.RAG.ComparisonServer do
     |> noreply
   end
 
-  def handle_info({ref, {:new_embed, {prompt, model_id}, variables, result}}, state) do
-    IO.puts ""
-    IO.inspect result, label: "#{__MODULE__}:#{__ENV__.line}"
-    IO.puts ""
+  def handle_info({ref, {:new_embed, key, variables, result}}, state) do
+    new_embeds = Map.put(state.embeds, key, result)
 
-    raise "X"
+    state = state
+    |> struct(%{embeds: new_embeds})
 
-    # new_state = struct(state, %{
-    #   responses: Map.put(state.responses, variable_value, response)
-    # })
-
-    # Fusion.broadcast(state.topic, %{
-    #   event: :new_response,
-    #   comparison_id: state.id,
-    #   variable_value: variable_value,
-    #   response: response
-    # })
+    variables
+    |> Enum.each(fn v ->
+      get_response(state, v)
+    end)
 
     state
     |> noreply

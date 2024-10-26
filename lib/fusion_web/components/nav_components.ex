@@ -64,14 +64,21 @@ defmodule FusionWeb.NavComponents do
 
             <.top_nav_item text="Comparator" active={@active == "compare"} route={~p"/compare"} />
 
+            <.top_nav_item
+              text="Models"
+              active={@active == "models"}
+              route={~p"/models"}
+            />
+
+            <.top_nav_item
+              text="Embeds"
+              active={@active == "embeds"}
+              route={~p"/embeds"}
+            />
+
+
             <%= if allow?(@current_user, ~w(admin)) do %>
               <.top_nav_item text="Admin" active={@active == "admin"} route={~p"/admin"} />
-
-              <.top_nav_item
-                text="Models"
-                active={@active == "models"}
-                route={~p"/admin/models"}
-              />
 
               <.top_nav_item
                 text="Accounts"

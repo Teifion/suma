@@ -5,6 +5,18 @@ defmodule Fusion.RAG.ModelLib do
   use FusionMacros, :library
   alias Fusion.RAG.{Model, ModelQueries}
 
+  def popular_models() do
+    [
+      "llama3.2:latest",
+      "llama3.1",
+      "gemma2",
+      "qwen2.5",
+      "phi3.5",
+      "nemotron-mini",
+      "mistral"
+    ]
+  end
+
   @doc """
   Queries to get the Model id, if it doesn't exist then one is created.
   """

@@ -103,6 +103,7 @@ defmodule FusionWeb do
 
       alias Fusion.Helper.StylingHelper
       import Fusion.Helper.StringHelper, only: [format_number: 1]
+      import Fusion.Account.AuthLib, only: [allow?: 2, allow_any?: 2]
       unquote(html_helpers())
     end
   end
@@ -113,6 +114,8 @@ defmodule FusionWeb do
 
       alias Fusion.Helper.StylingHelper
       import Fusion.Helper.StringHelper, only: [format_number: 1]
+
+      import Fusion.Account.AuthLib, only: [allow?: 2, allow_any?: 2]
 
       unquote(html_helpers())
       unquote(server())

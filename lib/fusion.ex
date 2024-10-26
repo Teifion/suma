@@ -43,7 +43,7 @@ defmodule Fusion do
     contents = batch_create_contents(content_param_list)
 
     # Create the embeds for a given model
-    model_name = "llama3.2"
+    model_name = "llama3.2:latest"
     batch_create_embeds(model_name, contents)
   end
 

@@ -1,4 +1,6 @@
 <div id="index-live-wrapper">
+  <FusionWeb.ModelComponents.filter_bar current_user={@current_user} active="list" />
+
   <.table id="models" rows={@models} table_class="table-sm table-hover">
     <:col :let={model} label="Name"><%= model.name %></:col>
     <:col :let={model} label="Active?">
