@@ -1,0 +1,11 @@
+<div id="index-live-wrapper">
+  <.table id="models" rows={@models} table_class="table-sm table-hover">
+    <:col :let={model} label="Name"><%= model.name %></:col>
+
+    <:action :let={model}>
+      <.link navigate={~p"/admin/models/#{model}"} class="btn btn-secondary btn-sm">
+        Show
+      </.link>
+    </:action>
+  </.table>
+</div>

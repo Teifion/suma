@@ -62,6 +62,21 @@ defmodule FusionWeb.Router do
     end
   end
 
+  scope "/admin/models", FusionWeb.Admin.Models do
+    pipe_through [:browser]
+
+    live_session :admin_models,
+      on_mount: [
+        {FusionWeb.UserAuth, :ensure_authenticated},
+        {FusionWeb.UserAuth, {:authorise, ~w(admin)}}
+      ] do
+      live "/", IndexLive
+      # live "/user/new", NewLive
+      # live "/user/edit/:user_id", ShowLive, :edit
+      # live "/user/:user_id", ShowLive
+    end
+  end
+
   scope "/admin/accounts", FusionWeb.Admin.Account do
     pipe_through [:browser]
 

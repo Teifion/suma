@@ -13,6 +13,7 @@ defmodule FusionWeb.CompareLive.Home do
     |> assign(:embed_name, nil)
     |> assign(:completion, completion)
     # |> update_nearest_embed
+    |> assign(:site_menu_active, "compare")
     |> ok
   end
 

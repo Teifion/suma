@@ -3,13 +3,23 @@
 <div class="row">
   <.menu_card
     :if={allow?(@current_user, ~w(admin))}
+    icon="superscript"
+    icon_class="fa-duotone"
+    url={~p"/admin/models"}
+  >
+    Models
+  </.menu_card>
+  
+  
+  <.menu_card
+    :if={allow?(@current_user, ~w(admin))}
     icon="fa-tachometer-alt"
     icon_class="fa-duotone"
     url={~p"/admin/live_dashboard"}
   >
     Live dashboard
   </.menu_card>
-
+  
   <.menu_card
     :if={allow?(@current_user, ~w(admin))}
     icon={StylingHelper.icon(:accounts)}

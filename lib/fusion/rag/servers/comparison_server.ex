@@ -273,8 +273,6 @@ defmodule Fusion.RAG.ComparisonServer do
       send(args[:id_callback], {:comparison_started, id})
     end
 
-    # send(self(), :startup)
-
     state = %State{
       id: id,
       topic: ComparisonLib.comparison_topic(id),

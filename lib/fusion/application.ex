@@ -27,6 +27,7 @@ defmodule Fusion.Application do
       # {Fusion.Worker, arg}
 
       Fusion.CacheClusterServer,
+      Fusion.RAG.ModelServer,
 
       # Sups and Registries
       {DynamicSupervisor, strategy: :one_for_one, name: Fusion.ComparisonSupervisor},

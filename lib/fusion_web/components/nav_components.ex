@@ -62,16 +62,22 @@ defmodule FusionWeb.NavComponents do
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <.top_nav_item text="Home" active={@active == "home"} route={~p"/"} />
 
+            <.top_nav_item text="Comparator" active={@active == "compare"} route={~p"/compare"} />
+
             <%= if allow?(@current_user, ~w(admin)) do %>
               <.top_nav_item text="Admin" active={@active == "admin"} route={~p"/admin"} />
+
+              <.top_nav_item
+                text="Models"
+                active={@active == "models"}
+                route={~p"/admin/models"}
+              />
 
               <.top_nav_item
                 text="Accounts"
                 active={@active == "account"}
                 route={~p"/admin/accounts"}
               />
-
-              <.top_nav_item text="Games" active={@active == "game"} route={~p"/"} />
 
               <.top_nav_item text="Logging" active={@active == "logging"} route={~p"/"} />
             <% end %>

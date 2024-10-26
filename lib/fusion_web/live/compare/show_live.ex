@@ -23,6 +23,7 @@ defmodule FusionWeb.CompareLive.Show do
           |> assign(:key_fields, ComparisonLib.key_fields())
           |> assign(:variables, comparison_state.variables)
           |> assign(:adding_variable?, false)
+          |> assign(:site_menu_active, "compare")
           |> ok
     end
   end

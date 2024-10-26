@@ -24,6 +24,10 @@ defmodule Fusion.Repo.Migrations.Embeds do
       add(:id, :uuid, primary_key: true, null: false)
       add(:name, :string)
 
+      add(:active?, :boolean)
+      add(:enabled?, :boolean)
+      add(:installed?, :boolean)
+
       timestamps(type: :utc_datetime)
     end
 
