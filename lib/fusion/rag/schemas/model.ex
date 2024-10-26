@@ -11,6 +11,11 @@ defmodule Fusion.RAG.Model do
     field(:enabled?, :boolean)
     field(:installed?, :boolean)
 
+    field(:details, :map)
+
+    field(:size, :integer)
+    field(:ollama_modified_at, :utc_datetime)
+
     timestamps(type: :utc_datetime)
     has_many(:embeds, Fusion.RAG.Embed)
   end
@@ -24,10 +29,10 @@ defmodule Fusion.RAG.Model do
     c = struct
     |> cast(
       attrs,
-      ~w(name active? enabled? installed?)a
+      ~w(name active? enabled? installed? details size ollama_modified_at)a
     )
     |> validate_required(
-      ~w(name active? enabled? installed?)a
+      ~w(name active? enabled? installed? details size ollama_modified_at)a
     )
   end
 end

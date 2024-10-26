@@ -71,9 +71,7 @@ defmodule FusionWeb.Router do
         {FusionWeb.UserAuth, {:authorise, ~w(admin)}}
       ] do
       live "/", IndexLive
-      # live "/user/new", NewLive
-      # live "/user/edit/:user_id", ShowLive, :edit
-      # live "/user/:user_id", ShowLive
+      live "/:model_name", ShowLive
     end
   end
 

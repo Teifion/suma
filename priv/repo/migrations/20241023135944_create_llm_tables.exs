@@ -1,4 +1,4 @@
-defmodule Fusion.Repo.Migrations.Embeds do
+defmodule Fusion.Repo.Migrations.CreateLLMTables do
   use Ecto.Migration
 
 
@@ -27,6 +27,10 @@ defmodule Fusion.Repo.Migrations.Embeds do
       add(:active?, :boolean)
       add(:enabled?, :boolean)
       add(:installed?, :boolean)
+
+      add(:details, :map)
+      add(:size, :bigint)
+      add(:ollama_modified_at, :utc_datetime)
 
       timestamps(type: :utc_datetime)
     end

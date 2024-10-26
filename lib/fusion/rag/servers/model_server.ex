@@ -25,6 +25,23 @@ defmodule Fusion.RAG.ModelServer do
   end
 
   @impl true
+  # At time of writing the structure of the model data was:
+  # %{
+  #   "details" => %{
+  #     "families" => ["qwen2"],
+  #     "family" => "qwen2",
+  #     "format" => "gguf",
+  #     "parameter_size" => "14.8B",
+  #     "parent_model" => "",
+  #     "quantization_level" => "Q4_K_M"
+  #   },
+  #   "digest" => "7cdf5a0187d5c58cc5d369b255592f7841d1c4696d45a8c8a9489440385b22f6",
+  #   "model" => "qwen2.5:14b",
+  #   "modified_at" => "2024-10-14T17:27:46.697190176+01:00",
+  #   "name" => "qwen2.5:14b",
+  #   "size" => 8988124069
+  # }
+
   def handle_info(:lookup_check, %State{} = state) do
     ollama_models = Ollama.list_models(state.client)
       |> elem(1)
@@ -41,11 +58,17 @@ defmodule Fusion.RAG.ModelServer do
         Enum.member?(existing_names, name)
       end)
       |> Enum.each(fn data ->
-        {:ok, _model} = ModelLib.create_model(%{
+        {:ok, modified_at, _utc_offset} = DateTime.from_iso8601(data["modified_at"])
+        modified_at = DateTime.truncate(modified_at, :second)
+
+        {:ok, model} = ModelLib.create_model(%{
           name: data["model"],
           active?: true,
           enabled?: true,
-          installed?: true
+          installed?: true,
+          details: data["details"],
+          ollama_modified_at: modified_at,
+          size: data["size"]
         })
       end)
 
