@@ -9,13 +9,12 @@ defmodule Fusion.RAG.ComparisonServer do
 
   alias Fusion.RAG
   use GenServer
-
-  @await_check_interval 250
-
   defmodule State do
     @moduledoc false
     defstruct ~w(id completion key_difference variables topic responses awaiting_tasks await_ref currently_awaiting embeds)a
   end
+
+  @new_embed_variables ~w(model_name user_prompt)a
 
   @impl true
   def handle_call(:get_completion, _from, state) do
@@ -38,7 +37,7 @@ defmodule Fusion.RAG.ComparisonServer do
       })
 
       # Do we need new embeds?
-      state = if Enum.member?(~w(model user_prompt)a, field) or Enum.empty?(state.embeds) do
+      state = if Enum.member?(@new_embed_variables, field) or Enum.empty?(state.embeds) do
         get_new_embeds(state)
       else
         state
@@ -57,6 +56,65 @@ defmodule Fusion.RAG.ComparisonServer do
     else
       state
     end
+    |> noreply
+  end
+
+  def handle_cast({:add_new_variable, new_variable}, state) do
+    if Enum.member?(state.variables, new_variable) do
+      state
+    else
+      # If the new variable will need a new embed we need to generate a new one for it
+      # before we can get a response
+      state = case state.key_difference do
+        :model_name ->
+          model = ModelLib.get_model_by_name!(new_variable)
+          embed = get_new_embed(state.completion.user_prompt, model)
+          new_embed_map = state.embeds
+            |> Map.put({state.completion.user_prompt, model.id}, embed)
+
+          struct(state, %{embeds: new_embed_map})
+        :user_prompt ->
+          model = ModelLib.get_model_by_name!(state.completion.model_name)
+          embed = get_new_embed(new_variable, model)
+          new_embed_map = state.embeds
+            |> Map.put({new_variable, model.id}, embed)
+
+          struct(state, %{embeds: new_embed_map})
+        _ ->
+          state
+      end
+
+      get_response(state, new_variable)
+
+      new_state = struct(state, %{
+        variables: state.variables ++ [new_variable]
+      })
+
+      Fusion.broadcast(state.topic, %{
+        event: :new_variable,
+        variables: new_state.variables,
+        comparison_id: state.id,
+      })
+
+      new_state
+    end
+    |> noreply
+  end
+
+  def handle_cast({:remove_variable, value}, state) do
+    new_state = struct(state, %{
+      variables: List.delete(state.variables, value),
+      responses: Map.delete(state.responses, value)
+    })
+
+    Fusion.broadcast(state.topic, %{
+      event: :removed_variable,
+      value: value,
+      variables: new_state.variables,
+      comparison_id: state.id,
+    })
+
+    new_state
     |> noreply
   end
 
@@ -83,34 +141,14 @@ defmodule Fusion.RAG.ComparisonServer do
     |> noreply
   end
 
-  def handle_info(:check_tasks, %State{currently_awaiting: :embeds} = state) do
-    state
-    |> noreply
-  end
-
-  def handle_info(:check_tasks, %State{currently_awaiting: :completions} = state) do
-    IO.puts "#{__MODULE__}:#{__ENV__.line}"
-    IO.inspect state.awaiting_tasks
-    IO.puts ""
-
-    state
-    |> noreply
-  end
-
   def handle_info(:generate_new_completions, %State{} = state) do
     tasks = state.variables
       |> Enum.map(fn variable_value ->
         get_response(state, variable_value)
       end)
 
-    IO.puts "#{__MODULE__}:#{__ENV__.line}"
-    IO.inspect tasks
-    IO.puts ""
-
-    # {:ok, tref} = :timer.send_interval(@await_check_interval, :check_tasks)
-
     new_state = struct(state, %{
-      currently_awaiting: :completions,
+      responses: %{},
     })
 
     Fusion.broadcast(state.topic, %{

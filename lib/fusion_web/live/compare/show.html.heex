@@ -28,7 +28,11 @@
 
 <div class="row mt-4" :if={assigns[:key_difference]}>
   <div class="col" :for={{value, idx} <- Enum.with_index(@variables)}>
-    <%= value %>
+    <div class="btn btn-sm btn-danger float-end" phx-click="remove-variable" phx-value-value={value}>
+      <Fontawesome.icon icon="times" style="regular" />
+    </div>
+    
+    <h4><%= value %></h4>
     <% response = assigns[:responses][value] %>
 
     <%= if response do %>
@@ -38,5 +42,37 @@
     <% else %>
       Awaiting...
     <% end %>
+  </div>
+  <div class="col" :if={!@adding_variable?}>
+    <form action="#" method="get" phx-submit="add-variable">
+      <%
+        key_type = cond do
+          Enum.member?(~w(model)a, @key_difference) -> :model
+          true -> :generic
+        end
+      %>
+
+      <div class="row" :if={key_type == :model}>
+        <div class="col">
+          <label for="control_id" class="control-label">Model</label>
+          <.input id="new-variable-model" type="select" name="variable-value" options={["llama3.2"]} value={""} />
+        </div>
+      </div>
+
+      <div class="row" :if={key_type == :generic}>
+        <div class="col">
+          <label for="control_id" class="control-label"><%= @key_difference %></label>
+          <.input id="new-variable-generic" type="text" name="variable-value" value={""} />
+        </div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col">
+          <button type="submit" class="btn btn-primary2 btn-block">
+            Add variable
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>

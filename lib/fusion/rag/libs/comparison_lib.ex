@@ -30,6 +30,14 @@ defmodule Fusion.RAG.ComparisonLib do
     cast_comparison(id, {:update_key_difference, new_key_difference})
   end
 
+  def add_new_variable(id, new_variable) do
+    cast_comparison(id, {:add_new_variable, new_variable})
+  end
+
+  def remove_variable(id, value) do
+    cast_comparison(id, {:remove_variable, value})
+  end
+
   # @spec send_keepalive(Comparison.id()) :: :ok | nil
   # def send_keepalive(comparison_id) do
   #   cast_comparison(comparison_id, :keepalive)

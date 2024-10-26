@@ -22,6 +22,7 @@ defmodule FusionWeb.CompareLive.Show do
           |> assign(:key_difference, comparison_state.key_difference)
           |> assign(:key_fields, ComparisonLib.key_fields())
           |> assign(:variables, comparison_state.variables)
+          |> assign(:adding_variable?, false)
           |> ok
     end
   end
@@ -33,8 +34,24 @@ defmodule FusionWeb.CompareLive.Show do
     |> ok
   end
 
+  @impl true
   def handle_event("update-key_difference", %{"key_difference" => key_difference}, %{assigns: assigns} = socket) do
     ComparisonLib.update_key_difference(assigns.id, key_difference)
+
+    socket
+    |> noreply
+  end
+
+  def handle_event("add-variable", %{"variable-value" => new_variable}, %{assigns: assigns} = socket) do
+    ComparisonLib.add_new_variable(assigns.id, new_variable)
+
+    socket
+    |> assign(:adding_variable?, true)
+    |> noreply
+  end
+
+  def handle_event("remove-variable", %{"value" => value}, %{assigns: assigns} = socket) do
+    ComparisonLib.remove_variable(assigns.id, value)
 
     socket
     |> noreply
@@ -53,6 +70,19 @@ defmodule FusionWeb.CompareLive.Show do
   def handle_info(%{topic: "Fusion.Comparison:" <> _, event: :new_key_difference} = msg, socket) do
     socket
     |> assign(:key_difference, msg.key_difference)
+    |> assign(:variables, msg.variables)
+    |> noreply
+  end
+
+  def handle_info(%{topic: "Fusion.Comparison:" <> _, event: :new_variable} = msg, socket) do
+    socket
+    |> assign(:variables, msg.variables)
+    |> assign(:adding_variable?, false)
+    |> noreply
+  end
+
+  def handle_info(%{topic: "Fusion.Comparison:" <> _, event: :removed_variable} = msg, socket) do
+    socket
     |> assign(:variables, msg.variables)
     |> noreply
   end
