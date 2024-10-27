@@ -53,7 +53,7 @@ defmodule FusionWeb.Router do
   scope "/models", FusionWeb.Models do
     pipe_through [:browser]
 
-    live_session :admin_models,
+    live_session :user_models,
       on_mount: [
         {FusionWeb.UserAuth, :ensure_authenticated},
         # {FusionWeb.UserAuth, {:authorise, ~w(admin)}}
@@ -61,6 +61,19 @@ defmodule FusionWeb.Router do
       live "/", IndexLive
       live "/new", NewLive
       live "/:model_name", ShowLive
+    end
+  end
+
+  scope "/embeds", FusionWeb.Embeds do
+    pipe_through [:browser]
+
+    live_session :user_embeds,
+      on_mount: [
+        {FusionWeb.UserAuth, :ensure_authenticated},
+        # {FusionWeb.UserAuth, {:authorise, ~w(admin)}}
+      ] do
+      live "/", IndexLive
+      live "/:id", ShowLive
     end
   end
 
@@ -73,19 +86,6 @@ defmodule FusionWeb.Router do
         {FusionWeb.UserAuth, {:authorise, "admin"}}
       ] do
       live "/", HomeLive, :index
-    end
-  end
-
-  scope "/admin/embeds", FusionWeb.Admin.Embeds do
-    pipe_through [:browser]
-
-    live_session :admin_embeds,
-      on_mount: [
-        {FusionWeb.UserAuth, :ensure_authenticated},
-        # {FusionWeb.UserAuth, {:authorise, ~w(admin)}}
-      ] do
-      live "/", IndexLive
-      live "/:model_name", ShowLive
     end
   end
 

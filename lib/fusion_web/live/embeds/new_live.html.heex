@@ -1,0 +1,23 @@
+<div :if={assigns[:models]}>
+  <form action="#" method="get" class="" phx-submit="form-get-model">
+    <div class="row">
+      <label for="control_id" class="control-label">Select model</label>
+      <.input id="model-select" type="text" name="model_name" value={} autofocus="autofocus" />
+    </div>
+
+    <button type="submit" class={"btn btn-primary float-end"}>
+      Get model
+    </button>
+  </form>
+  <br />
+  
+  <h4>Or grab a commonly selected model:</h4>
+  <div class="btn btn-info m-1"
+    :for={model_name <- @popular_models}
+    phx-click="quick-get-model"
+    phx-value-model_name={model_name}
+  >
+    <Fontawesome.icon icon="download" style="regular" />
+    <%= model_name %>
+  </div>
+</div>

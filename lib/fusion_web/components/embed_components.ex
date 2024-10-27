@@ -1,14 +1,14 @@
-defmodule FusionWeb.ModelComponents do
+defmodule FusionWeb.EmbedComponents do
   @moduledoc false
   use FusionWeb, :component
   import FusionWeb.{NavComponents}
 
   @doc """
-  <FusionWeb.ModelComponents.filter_bar active="active" />
+  <FusionWeb.EmbedComponents.filter_bar active="active" />
 
-  <FusionWeb.ModelComponents.filter_bar active="active">
+  <FusionWeb.EmbedComponents.filter_bar active="active">
     Right side content here
-  </FusionWeb.ModelComponents.filter_bar>
+  </FusionWeb.EmbedComponents.filter_bar>
   """
   attr :selected, :string, default: "list"
   attr :current_user, :map, required: true
@@ -22,7 +22,7 @@ defmodule FusionWeb.ModelComponents do
           colour="info"
           icon={StylingHelper.icon(:list)}
           active={@selected == "list"}
-          url={~p"/models"}
+          url={~p"/embeds"}
         >
           List
         </.section_menu_button_url>
@@ -32,7 +32,7 @@ defmodule FusionWeb.ModelComponents do
           colour="info"
           icon={StylingHelper.icon(:new)}
           active={@selected == "new"}
-          url={~p"/models/new"}
+          url={~p"/embeds/new"}
         >
           New
         </.section_menu_button_url>
