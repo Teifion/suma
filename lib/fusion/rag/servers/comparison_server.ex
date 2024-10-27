@@ -5,13 +5,13 @@ defmodule Fusion.RAG.ComparisonServer do
 
   use FusionWeb, :server
 
-  alias Fusion.RAG.{Completion, CompletionLib, ComparisonLib, EmbedLib, ModelLib}
+  alias Fusion.RAG.{Completion, CompletionLib, ComparisonLib, EmbedLib, ModelLib, ContentLib}
 
   alias Fusion.RAG
   use GenServer
   defmodule State do
     @moduledoc false
-    defstruct ~w(id completion key_difference variables topic responses embeds)a
+    defstruct ~w(id completion key_difference variables topic responses embeds contents)a
   end
 
   @new_embed_variables ~w(model_name user_prompt)a
@@ -37,8 +37,14 @@ defmodule Fusion.RAG.ComparisonServer do
       })
 
       # Do we need new embeds?
-      state = if Enum.member?(@new_embed_variables, field) or Enum.empty?(state.embeds) do
-        request_new_embeds(state)
+      # state = if Enum.member?(@new_embed_variables, field) or Enum.empty?(state.embeds) do
+      #   request_new_embeds(state)
+      # else
+      #   state
+      # end
+
+      state = if Enum.member?(@new_embed_variables, field) or Enum.empty?(state.contents) do
+        request_new_contents(state)
       else
         state
       end
@@ -68,10 +74,12 @@ defmodule Fusion.RAG.ComparisonServer do
       case state.key_difference do
         :model_name ->
           model = ModelLib.get_model_by_name!(new_variable)
-          request_new_embed(state.completion.user_prompt, model, new_variable)
+          # request_new_embed(state.completion.user_prompt, model, new_variable)
+          request_new_content(state.completion.user_prompt, model, new_variable)
         :user_prompt ->
           model = ModelLib.get_model_by_name!(state.completion.model_name)
-          request_new_embed(new_variable, model, new_variable)
+          # request_new_embed(new_variable, model, new_variable)
+          request_new_content(new_variable, model, new_variable)
         _ ->
           :ok
       end
@@ -117,26 +125,26 @@ defmodule Fusion.RAG.ComparisonServer do
     |> noreply
   end
 
-  def handle_info({ref, {:new_embed, key, variables, nil}}, state) do
-    new_embeds = Map.put(state.embeds, key, :none)
+  # def handle_info({ref, {:new_embed, key, variables, result}}, state) do
+  #   new_embeds = Map.put(state.embeds, key, result)
+
+  #   state = state
+  #   |> struct(%{embeds: new_embeds})
+
+  #   variables
+  #   |> Enum.each(fn v ->
+  #     get_response(state, v)
+  #   end)
+
+  #   state
+  #   |> noreply
+  # end
+
+  def handle_info({ref, {:new_content, key, variables, result}}, state) do
+    new_contents = Map.put(state.contents, key, result)
 
     state = state
-    |> struct(%{embeds: new_embeds})
-
-    variables
-    |> Enum.each(fn v ->
-      get_response(state, v)
-    end)
-
-    state
-    |> noreply
-  end
-
-  def handle_info({ref, {:new_embed, key, variables, result}}, state) do
-    new_embeds = Map.put(state.embeds, key, result)
-
-    state = state
-    |> struct(%{embeds: new_embeds})
+    |> struct(%{contents: new_contents})
 
     variables
     |> Enum.each(fn v ->
@@ -166,8 +174,15 @@ defmodule Fusion.RAG.ComparisonServer do
   def handle_info(:generate_new_completions, %State{} = state) do
     _tasks = state.variables
       |> Enum.map(fn variable_value ->
-        # Do we need to generate an embed?
-        if get_existing_embed(state, variable_value) == nil do
+        # # Do we need to generate an embed?
+        # if get_existing_embed(state, variable_value) == nil do
+        #   nil
+        # else
+        #   get_response(state, variable_value)
+        # end
+
+        # Do we need to generate a content?
+        if get_existing_content(state, variable_value) == nil do
           nil
         else
           get_response(state, variable_value)
@@ -221,20 +236,27 @@ defmodule Fusion.RAG.ComparisonServer do
       RAG.default_system_prompt()
     end
 
-    vectors = if key_difference == :content do
-      state.embeds[variable_value]
-    else
-      embed = state.embeds[{user_prompt, model.id}]
-      if embed == :none do
-        %{vectors: Pgvector.new([])}
-      else
-        embed
-      end
-    end
-    |> Map.get(:vectors)
-    |> Pgvector.to_list()
+    # Using the vectors in the prompt, I may have misread the docs....
+    # vectors = if key_difference == :content do
+    #   state.embeds[variable_value]
+    # else
+    #   embed = state.embeds[{user_prompt, model.id}]
+    #   if embed == :none do
+    #     %{vectors: Pgvector.new([])}
+    #   else
+    #     embed
+    #   end
+    # end
+    # |> Map.get(:vectors)
+    # |> Pgvector.to_list()
 
-    final_prompt = RAG.format_prompt(user_prompt, vectors, system_prompt)
+    embed_content = if key_difference == :content do
+      state.contents[variable_value]
+    else
+      state.contents[{user_prompt, model.id}]
+    end
+
+    final_prompt = RAG.format_prompt(user_prompt, embed_content, system_prompt)
 
     Task.async(fn ->
       response = CompletionLib.get_response(
@@ -247,51 +269,106 @@ defmodule Fusion.RAG.ComparisonServer do
     end)
   end
 
-  defp get_existing_embed(%{key_difference: :model_name} = state, value) do
+  # defp get_existing_embed(%{key_difference: :model_name} = state, value) do
+  #   model = RAG.ModelLib.get_model_by_name!(value)
+  #   state.embeds[{state.completion.user_prompt, model.id}]
+  # end
+
+  # defp get_existing_embed(%{key_difference: :user_prompt} = state, value) do
+  #   model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
+  #   state.embeds[{value, model.id}]
+  # end
+
+  # defp get_existing_embed(state, _value) do
+  #   model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
+  #   state.embeds[{state.completion.user_prompt, model.id}]
+  # end
+
+  # defp request_new_embeds(%{key_difference: :model_name} = state) do
+  #   embed_map = state.variables
+  #   |> Enum.each(fn value ->
+  #     model = RAG.ModelLib.get_model_by_name!(value)
+  #     request_new_embed(state.completion.user_prompt, model, value)
+  #   end)
+
+  #   struct(state, %{
+  #     embeds: %{}
+  #   })
+  # end
+
+  # defp request_new_embeds(%{key_difference: :user_prompt} = state) do
+  #   model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
+
+  #   embed_map = state.variables
+  #   |> Enum.each(fn value ->
+  #     request_new_embed(value, model, value)
+  #   end)
+
+  #   struct(state, %{
+  #     embeds: %{}
+  #   })
+  # end
+
+  # defp request_new_embed(user_prompt, model, variables) do
+  #   Task.async(fn ->
+  #     embed_result = EmbedLib.get_nearest_embed(user_prompt, model, Ollama.init())
+
+  #     {:new_embed, {user_prompt, model.id}, List.wrap(variables), embed_result}
+  #   end)
+  # end
+
+  defp get_existing_content(%{key_difference: :model_name} = state, value) do
     model = RAG.ModelLib.get_model_by_name!(value)
-    state.embeds[{state.completion.user_prompt, model.id}]
+    state.contents[{state.completion.user_prompt, model.id}]
   end
 
-  defp get_existing_embed(%{key_difference: :user_prompt} = state, value) do
+  defp get_existing_content(%{key_difference: :user_prompt} = state, value) do
     model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
-    state.embeds[{value, model.id}]
+    state.contents[{value, model.id}]
   end
 
-  defp get_existing_embed(state, _value) do
+  defp get_existing_content(state, _value) do
     model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
-    state.embeds[{state.completion.user_prompt, model.id}]
+    state.contents[{state.completion.user_prompt, model.id}]
   end
 
-  defp request_new_embeds(%{key_difference: :model_name} = state) do
-    embed_map = state.variables
+  defp request_new_contents(%{key_difference: :model_name} = state) do
+    content_map = state.variables
     |> Enum.each(fn value ->
       model = RAG.ModelLib.get_model_by_name!(value)
-      request_new_embed(state.completion.user_prompt, model, value)
+      request_new_content(state.completion.user_prompt, model, value)
     end)
 
     struct(state, %{
-      embeds: %{}
+      contents: %{}
     })
   end
 
-  defp request_new_embeds(%{key_difference: :user_prompt} = state) do
+  defp request_new_contents(%{key_difference: :user_prompt} = state) do
     model = RAG.ModelLib.get_model_by_name!(state.completion.model_name)
 
-    embed_map = state.variables
+    content_map = state.variables
     |> Enum.each(fn value ->
-      request_new_embed(value, model, value)
+      request_new_content(value, model, value)
     end)
 
     struct(state, %{
-      embeds: %{}
+      contents: %{}
     })
   end
 
-  defp request_new_embed(user_prompt, model, variables) do
+  defp request_new_content(user_prompt, model, variables) do
     Task.async(fn ->
-      embed_result = EmbedLib.get_nearest_embed(user_prompt, model, Ollama.init())
+      embed = EmbedLib.get_nearest_embed(user_prompt, model, Ollama.init())
 
-      {:new_embed, {user_prompt, model.id}, List.wrap(variables), embed_result}
+      content_result = if embed do
+        content_object = ContentLib.get_content!(embed.content_id)
+        |> Map.get(:text)
+      else
+        ""
+      end
+
+      {:new_content, {user_prompt, model.id}, List.wrap(variables), content_result}
     end)
   end
 
@@ -329,7 +406,8 @@ defmodule Fusion.RAG.ComparisonServer do
       key_difference: nil,
       variables: [],
       responses: %{},
-      embeds: %{}
+      embeds: %{},
+      contents: %{}
     }
 
     {:ok, state}
