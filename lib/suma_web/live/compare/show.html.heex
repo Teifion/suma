@@ -1,0 +1,80 @@
+<div style="height: 15px;">&nbsp;</div>
+
+<div class="row">
+  <.live_component
+    :if={assigns[:completion] && assigns[:key_difference]}
+    module={SumaWeb.RAG.CompletionComponent}
+    id={:completion_component}
+    completion={@completion}
+    title="LLM Options"
+    model_names={@model_names}
+    key_difference={assigns[:key_difference]}
+    action={:edit}
+  />
+</div>
+
+<div class="row mt-4">
+  <form action={"#"} phx-change="update-key_difference" method="post" class="">
+    <div class="row">
+      <div class="col">
+        <%= if is_nil(assigns[:key_difference]) do %>
+          <h4>Select a key difference to compare</h4>
+        <% end %>
+
+        <label for="key-difference-update-select" class="control-label">Key difference:</label>
+        <.input id="key-difference-update-select" type="select" name="key_difference" options={["Pick a field" | @key_fields]} value={assigns[:key_difference]} />
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="row mt-4" :if={assigns[:key_difference]}>
+  <div class="col" :for={{value, idx} <- Enum.with_index(@variables)}>
+    <div class="btn btn-sm btn-danger float-end" phx-click="remove-variable" phx-value-value={value}>
+      <Fontawesome.icon icon="times" style="regular" />
+    </div>
+    
+    <h4><%= value %></h4>
+    <% response = assigns[:responses][value] %>
+
+    <%= if response do %>
+      <textarea id={"textarea-#{idx}"} rows="8" class="form-control"><%=
+        response["response"]
+      %></textarea>
+    <% else %>
+      Awaiting...
+    <% end %>
+  </div>
+  <div class="col" :if={!@adding_variable?}>
+    <form action="#" method="get" phx-submit="add-variable">
+      <%
+        key_type = cond do
+          Enum.member?(~w(model_name)a, @key_difference) -> :model_name
+          true -> :generic
+        end
+      %>
+
+      <div class="row" :if={key_type == :model_name}>
+        <div class="col">
+          <label for="control_id" class="control-label">Model</label>
+          <.input id="new-variable-model" type="select" name="variable-value" options={@model_names |> Enum.reject(fn n -> Enum.member?(@variables, n) end)} value={""} />
+        </div>
+      </div>
+
+      <div class="row" :if={key_type == :generic}>
+        <div class="col">
+          <label for="control_id" class="control-label"><%= @key_difference %></label>
+          <.input id="new-variable-generic" type="text" name="variable-value" value={""} />
+        </div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col">
+          <button type="submit" class="btn btn-primary2 btn-block">
+            Add variable
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

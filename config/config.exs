@@ -7,21 +7,21 @@
 # General application configuration
 import Config
 
-config :fusion,
-  ecto_repos: [Fusion.Repo]
+config :suma,
+  ecto_repos: [Suma.Repo]
 
-config :fusion,
-  Fusion.Repo, types: Fusion.PostgrexTypes
+config :suma,
+  Suma.Repo, types: Suma.PostgrexTypes
 
 # Configures the endpoint
-config :fusion, FusionWeb.Endpoint,
+config :suma, SumaWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: FusionWeb.ErrorHTML, json: FusionWeb.ErrorJSON],
+    formats: [html: SumaWeb.ErrorHTML, json: SumaWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Fusion.PubSub,
+  pubsub_server: Suma.PubSub,
   live_view: [signing_salt: "51GUT9iP"]
 
 # Configures the mailer
@@ -31,7 +31,7 @@ config :fusion, FusionWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :fusion, Fusion.Mailer, adapter: Swoosh.Adapters.Local
+config :suma, Suma.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,

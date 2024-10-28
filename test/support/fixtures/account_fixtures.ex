@@ -1,6 +1,6 @@
-defmodule Fusion.AccountFixtures do
+defmodule Suma.AccountFixtures do
   @moduledoc false
-  alias Fusion.Account.User
+  alias Suma.Account.User
 
   @spec user_fixture() :: User.t()
   @spec user_fixture(map) :: User.t()
@@ -19,6 +19,6 @@ defmodule Fusion.AccountFixtures do
       },
       :full
     )
-    |> Fusion.Repo.insert!()
+    |> Suma.Repo.insert!()
   end
 end

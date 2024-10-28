@@ -5,23 +5,23 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :fusion, Fusion.Repo,
-  username: "fusion_test",
+config :suma, Suma.Repo,
+  username: "suma_test",
   password: "123456789",
   hostname: "localhost",
-  database: "fusion_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "suma_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :fusion, FusionWeb.Endpoint,
+config :suma, SumaWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "mOFrow0rdGspoZT8Bdnv5qSU8N4p8ZawM0OoIYvQ+08BhFA325EKcZxvkjMKXWRq",
   server: false
 
 # In test we don't send emails.
-config :fusion, Fusion.Mailer, adapter: Swoosh.Adapters.Test
+config :suma, Suma.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false

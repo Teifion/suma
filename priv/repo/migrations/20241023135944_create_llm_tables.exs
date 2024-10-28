@@ -1,4 +1,4 @@
-defmodule Fusion.Repo.Migrations.CreateLLMTables do
+defmodule Suma.Repo.Migrations.CreateLLMTables do
   use Ecto.Migration
 
 

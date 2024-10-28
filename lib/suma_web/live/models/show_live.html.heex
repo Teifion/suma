@@ -1,0 +1,82 @@
+<SumaWeb.ModelComponents.filter_bar current_user={@current_user} active="show" />
+
+<div :if={assigns[:edit_mode] != true} class="row mt-4">
+  <div class="col">
+    <.card :if={@model}>
+      <h4 class="d-inline-block">
+        <%= @model.name %>
+      </h4>
+      
+      <div class="float-end">
+        <a class="btn btn-danger" phx-click="delete-model">
+          <Fontawesome.icon icon={StylingHelper.icon(:delete)} style="solid" /> Delete
+        </a>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <td><strong>Active?</strong></td>
+                <td><.boolean_icon value={@model.active?} true="check" false="cross" style="solid" /></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td><strong>Enabled?</strong></td>
+                <td><.boolean_icon value={@model.enabled?} true="check" false="cross" style="solid" /></td>
+                <td :if={@model.enabled?}>
+                  <div class="btn btn-sm btn-outline-secondary" phx-click="disable-model" :if={allow?(@current_user, ["admin"])}>
+                    Disable
+                  </div>
+                </td>
+                <td :if={!@model.enabled?}>
+                  <div class="btn btn-sm btn-outline-secondary" phx-click="enable-model" :if={allow?(@current_user, ["admin"])}>
+                    Enable
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Installed?</strong></td>
+                <td><.boolean_icon value={@model.installed?} true="check" false="cross" style="solid" /></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      
+        <div class="col">
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <td><strong>Model last modified</strong></td>
+                <td><%= Calendar.strftime(@model.ollama_modified_at, "%Y-%m-%d %I:%M:%S") %></td>
+              </tr>
+              <tr>
+                <td><strong>Size</strong></td>
+                <td><%= Suma.Helper.StringHelper.format_number(@model.size) %></td>
+              </tr>
+              <tr>
+                <td><strong>Family</strong></td>
+                <td><%= @model.details["family"] %></td>
+              </tr>
+              <tr>
+                <td><strong>Parameter size</strong></td>
+                <td><%= @model.details["parameter_size"] %></td>
+              </tr>
+              <tr>
+                <td><strong>Quantization level</strong></td>
+                <td><%= @model.details["quantization_level"] %></td>
+              </tr>
+              <tr>
+                <td><strong>Format</strong></td>
+                <td><%= @model.details["format"] %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </.card>
+  </div>
+</div>

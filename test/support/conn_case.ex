@@ -1,4 +1,4 @@
-defmodule FusionWeb.ConnCase do
+defmodule SumaWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule FusionWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use FusionWeb.ConnCase, async: true`, although
+  by setting `use SumaWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -20,28 +20,28 @@ defmodule FusionWeb.ConnCase do
   using do
     quote do
       # The default endpoint for testing
-      @endpoint FusionWeb.Endpoint
+      @endpoint SumaWeb.Endpoint
 
-      use FusionWeb, :verified_routes
+      use SumaWeb, :verified_routes
 
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import FusionWeb.ConnCase
+      import SumaWeb.ConnCase
     end
   end
 
   setup tags do
-    Fusion.DataCase.setup_sandbox(tags)
+    Suma.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
   @spec auth(map()) :: map()
   def auth(data) do
     {:ok, user} =
-      Fusion.Account.create_user(%{
-        name: Fusion.uuid(),
-        email: "#{Fusion.uuid()}@test",
+      Suma.Account.create_user(%{
+        name: Suma.uuid(),
+        email: "#{Suma.uuid()}@test",
         password: "password",
         groups: [],
         permissions: []
@@ -55,9 +55,9 @@ defmodule FusionWeb.ConnCase do
   @spec admin_auth(map()) :: map()
   def admin_auth(data) do
     {:ok, user} =
-      Fusion.Account.create_user(%{
-        name: Fusion.uuid(),
-        email: "#{Fusion.uuid()}@test",
+      Suma.Account.create_user(%{
+        name: Suma.uuid(),
+        email: "#{Suma.uuid()}@test",
         password: "password",
         groups: ["admin"],
         permissions: ["admin"]
@@ -70,7 +70,7 @@ defmodule FusionWeb.ConnCase do
 
   @spec log_in_user(map()) :: map()
   defp log_in_user(%{conn: conn, user: user} = data) do
-    {:ok, token} = Fusion.Account.create_user_token(user.id, "test", "test-user", "127.0.0.1")
+    {:ok, token} = Suma.Account.create_user_token(user.id, "test", "test-user", "127.0.0.1")
 
     conn =
       conn

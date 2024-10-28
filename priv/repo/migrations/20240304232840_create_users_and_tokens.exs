@@ -1,4 +1,4 @@
-defmodule Fusion.Repo.Migrations.CreateUsersAndTokens do
+defmodule Suma.Repo.Migrations.CreateUsersAndTokens do
   use Ecto.Migration
 
   def change do

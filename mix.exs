@@ -1,12 +1,12 @@
-defmodule Fusion.MixProject do
+defmodule Suma.MixProject do
   use Mix.Project
 
-  # @source_url "https://github.com/Teifion/Fusion"
+  # @source_url "https://github.com/Teifion/Suma"
   @version "0.0.1"
 
   def project do
     [
-      app: :fusion,
+      app: :suma,
       version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -29,7 +29,7 @@ defmodule Fusion.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Fusion.Application, []},
+      mod: {Suma.Application, []},
       extra_applications: [:logger, :runtime_tools, :iex]
     ]
   end

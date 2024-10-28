@@ -35,8 +35,8 @@ jobs:
         image: postgres:15
         ports: ['5432:5432']
         env:
-          POSTGRES_DB: fusion_test
-          POSTGRES_USER: fusion_test
+          POSTGRES_DB: suma_test
+          POSTGRES_USER: suma_test
           POSTGRES_PASSWORD: 123456789
         options: >-
           --health-cmd pg_isready

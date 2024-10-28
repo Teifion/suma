@@ -1,0 +1,15 @@
+<div style="height: 15px;">&nbsp;</div>
+
+<div class="row">
+  <.live_component
+    :if={assigns[:completion]}
+    module={SumaWeb.RAG.CompletionComponent}
+    id={:completion_component}
+    completion={@completion}
+    title="LLM Options"
+    model_names={@model_names}
+    action={:new}
+    content_name={assigns[:content_name]}
+    key_difference={nil}
+  />
+</div>

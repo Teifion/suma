@@ -12,12 +12,12 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/fusion start
+#     PHX_SERVER=true bin/suma start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :fusion, FusionWeb.Endpoint, server: true
+  config :suma, SumaWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -25,7 +25,7 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :fusion, Fusion.Repo,
+  config :suma, Suma.Repo,
     # ssl: true,
     username: System.get_env("DATABASE_USERNAME"),
     password: System.get_env("DATABASE_PASSWORD"),
@@ -49,7 +49,7 @@ if config_env() == :prod do
   host = System.get_env("PHX_HOST") || System.get_env("DOMAIN_NAME")
   domain_name = System.get_env("DOMAIN_NAME") || raise "DOMAIN_NAME not set"
 
-  config :fusion, FusionWeb.Endpoint,
+  config :suma, SumaWeb.Endpoint,
     url: [
       host: host,
       scheme: "https"

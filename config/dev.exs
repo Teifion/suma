@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :fusion, Fusion.Repo,
-  username: "fusion_dev",
+config :suma, Suma.Repo,
+  username: "suma_dev",
   password: "postgres",
   hostname: "localhost",
-  database: "fusion_dev",
+  database: "suma_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :fusion, Fusion.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with esbuild to bundle .js and .css sources.
-config :fusion, FusionWeb.Endpoint,
+config :suma, SumaWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -63,17 +63,17 @@ config :fusion, FusionWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :fusion, FusionWeb.Endpoint,
+config :suma, SumaWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/fusion_web/(controllers|live|components|live_components)/.*(ex|heex)$"
+      ~r"lib/suma_web/(controllers|live|components|live_components)/.*(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :fusion, dev_routes: true
+config :suma, dev_routes: true
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -86,7 +86,7 @@ config :phoenix, :plug_init_mode, :runtime
 config :swoosh, :api_client, false
 
 # Comment the below block to allow background jobs to happen in dev
-config :fusion, Oban,
+config :suma, Oban,
   queues: false,
   crontab: false
 

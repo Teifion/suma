@@ -1,0 +1,15 @@
+<SumaWeb.UserComponents.filter_bar selected="new" />
+
+<div class="row mt-4">
+  <div class="col">
+    <.live_component
+      module={SumaWeb.Account.UserFormComponent}
+      id={:new}
+      action={:new}
+      user={%Suma.Account.User{}}
+      patch={~p"/admin/accounts"}
+      title="New user form"
+      current_user={@current_user}
+    />
+  </div>
+</div>

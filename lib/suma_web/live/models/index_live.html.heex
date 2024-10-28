@@ -1,0 +1,32 @@
+<div id="index-live-wrapper">
+  <SumaWeb.ModelComponents.filter_bar current_user={@current_user} active="list">
+    <.section_menu_button
+      phx-click="refresh-list"
+      colour="info"
+      icon="sync"
+      url="#"
+    >
+      Refresh
+    </.section_menu_button>
+  </SumaWeb.ModelComponents.filter_bar>
+
+  <.table id="models" rows={@models} table_class="table-sm table-hover">
+    <:col :let={model} label="Name"><%= model.name %></:col>
+    <:col :let={model} label="Active?">
+      <.boolean_icon value={model.active?} true="check" false="cross" style="solid" />
+    </:col>
+    
+    <:col :let={model} label="Installed?">
+      <.boolean_icon value={model.installed?} true="check" false="cross" style="solid" />
+    </:col>
+    <:col :let={model} label="Enabled?">
+      <.boolean_icon value={model.enabled?} true="check" false="cross" style="solid" />
+    </:col>
+    
+    <:action :let={model}>
+      <.link navigate={~p"/models/#{model.name}"} class="btn btn-secondary btn-sm">
+        Show
+      </.link>
+    </:action>
+  </.table>
+</div>

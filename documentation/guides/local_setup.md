@@ -1,5 +1,5 @@
 # Local setup
-This is a guide for developing Fusion locally. If you are just deploying Fusion then you likely will not need this guide. Fusion is a [Phoenix](https://www.phoenixframework.org/) project with a few extra steps. This guide is primarily aimed at those who are new to Elixir/Phoenix.
+This is a guide for developing Suma locally. If you are just deploying Suma then you likely will not need this guide. Suma is a [Phoenix](https://www.phoenixframework.org/) project with a few extra steps. This guide is primarily aimed at those who are new to Elixir/Phoenix.
 
 ## Install services
 You will need to install:
@@ -10,8 +10,8 @@ I prefer using [asdf](https://github.com/asdf-vm/asdf) and have included a `.too
 
 ## Clone repo and pull dependencies
 ```bash
-git clone git@github.com:Teifion/Fusion.git
-cd fusion
+git clone git@github.com:Teifion/Suma.git
+cd suma
 mix deps.get && mix deps.compile
 ```
 
@@ -20,15 +20,15 @@ If you want to change the username or password then you will need to update the 
 ```bash
 sudo su postgres
 psql postgres postgres <<EOF
-CREATE USER fusion_dev WITH PASSWORD 'postgres';
-CREATE DATABASE fusion_dev;
-GRANT ALL PRIVILEGES ON DATABASE fusion_dev to fusion_dev;
-ALTER USER fusion_dev WITH SUPERUSER;
+CREATE USER suma_dev WITH PASSWORD 'postgres';
+CREATE DATABASE suma_dev;
+GRANT ALL PRIVILEGES ON DATABASE suma_dev to suma_dev;
+ALTER USER suma_dev WITH SUPERUSER;
 
-CREATE USER fusion_test WITH PASSWORD 'postgres';
-CREATE DATABASE fusion_test;
-GRANT ALL PRIVILEGES ON DATABASE fusion_test to fusion_test;
-ALTER USER fusion_test WITH SUPERUSER;
+CREATE USER suma_test WITH PASSWORD 'postgres';
+CREATE DATABASE suma_test;
+GRANT ALL PRIVILEGES ON DATABASE suma_test to suma_test;
+ALTER USER suma_test WITH SUPERUSER;
 EOF
 exit
 ```
@@ -69,7 +69,7 @@ If you want to do things like have a discord bot in development you don't want t
 
 ## Creating your admin account
 ```elixir
-Fusion.Account.create_user(%{
+Suma.Account.create_user(%{
   name: "root",
   email: "root@localhost",
   password: "password",
@@ -80,8 +80,8 @@ Fusion.Account.create_user(%{
 
 Editing it if you change something later
 ```elixir
-user = Fusion.Account.get_user_by_email("root@localhost")
-Fusion.Account.update_user(user, %{
+user = Suma.Account.get_user_by_email("root@localhost")
+Suma.Account.update_user(user, %{
   groups: ["admin"],
   permissions: ["admin"]
 })
@@ -93,6 +93,6 @@ When running locally it's likely you won't want to connect the server to an emai
 Run your server with `iex -S mix phx.server` and then once it has started up use the following code to update your password.
 
 ```elixir
-user = Fusion.Account.get_user_by_email("root@localhost")
-Fusion.Account.update_user(user, %{"password" => "your password here"})
+user = Suma.Account.get_user_by_email("root@localhost")
+Suma.Account.update_user(user, %{"password" => "your password here"})
 ```

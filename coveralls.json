@@ -1,7 +1,7 @@
 {
   "skip_files": [
     "^test/.*",
-    "lib/fusion/migrations/*"
+    "lib/suma/migrations/*"
   ],
   
   "terminal_options": {
