@@ -18,7 +18,7 @@ defmodule FusionWeb.Models.ShowLive do
 
       {:ok, socket}
     else
-      {:ok, redirect(socket, to: ~p"/admin/models")}
+      {:ok, redirect(socket, to: ~p"/models")}
     end
   end
 
@@ -70,40 +70,43 @@ defmodule FusionWeb.Models.ShowLive do
 
   @impl true
   @spec handle_event(String.t(), map(), Phoenix.Socket.t()) :: {:noreply, Phoenix.Socket.t()}
-  def handle_event("delete-user-token", %{"token_id" => token_id}, socket) do
-    token = Fusion.Models.get_user_token(token_id)
-    Fusion.Models.delete_user_token(token)
+  def handle_event("enable-model", _, socket) do
+    if allow?(socket, ~w(admin)) do
+      ModelLib.update_model(socket.assigns.model, %{enabled?: true})
+      model = ModelLib.get_model!(socket.assigns.model.id)
 
-    socket
-    |> get_other_data
-    |> noreply
+      socket
+      |> assign(:model, model)
+      |> noreply
+    else
+      socket
+      |> noreply
+    end
   end
 
-  @spec get_user(Phoenix.Socket.t()) :: Phoenix.Socket.t()
-  defp get_user(%{assigns: %{user_id: user_id}} = socket) do
-    user =
-      try do
-        Fusion.Models.get_user(user_id)
-      rescue
-        _ in Ecto.Query.CastError ->
-          nil
-      end
+  def handle_event("disable-model", _, socket) do
+    if allow?(socket, ~w(admin)) do
+      ModelLib.update_model(socket.assigns.model, %{enabled?: false})
+      model = ModelLib.get_model!(socket.assigns.model.id)
 
-    socket
-    |> assign(:user, user)
+      socket
+      |> assign(:model, model)
+      |> noreply
+    else
+      socket
+      |> noreply
+    end
   end
 
-  @spec get_other_data(Phoenix.Socket.t()) :: Phoenix.Socket.t()
-  defp get_other_data(%{assigns: %{user: nil}} = socket) do
-    socket
-    |> assign(:tokens, [])
-  end
+  def handle_event("delete-model", _, socket) do
+    if allow?(socket, ~w(admin)) do
+      ModelLib.cast_model_server({:delete_model, socket.assigns.model.id})
 
-  defp get_other_data(%{assigns: %{user: user}} = socket) do
-    socket
-    |> assign(
-      :tokens,
-      Fusion.Models.list_user_tokens(where: [user_id: user.id], order_by: ["Most recently used"])
-    )
+      socket
+      |> noreply
+    else
+      socket
+      |> noreply
+    end
   end
 end

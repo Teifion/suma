@@ -15,11 +15,11 @@ defmodule FusionWeb.RAG.CompletionComponent do
           <%!-- Core properties --%>
           <div class="col-md-12 col-lg-6">
             <label for="completion_user_prompt" class="control-label">User prompt:</label>
-            <.input field={@form[:user_prompt]} type="text" phx-debounce="500" autofocus="autofocus" />
+            <.input field={@form[:user_prompt]} type="text" phx-debounce="500" autofocus="autofocus" disabled={@key_difference == :user_prompt && "disabled"} />
             <br />
 
             <label for="completion_model_name" class="control-label">Model name:</label>
-            <.input field={@form[:model_name]} options={@model_names} type="select" phx-debounce="500" />
+            <.input field={@form[:model_name]} options={@model_names} type="select" phx-debounce="500" disabled={@key_difference == :model_name && "disabled"} />
             <br />
           </div>
 
@@ -93,7 +93,7 @@ defmodule FusionWeb.RAG.CompletionComponent do
   end
 
   defp save_completion(socket, :new, completion_params) do
-    {:ok, pid} = ComparisonLib.start_comparison_server(completion_params)
+    {:ok, _pid} = ComparisonLib.start_comparison_server(completion_params)
 
     # case Account.create_completion(completion_params) do
     #   {:ok, completion} ->

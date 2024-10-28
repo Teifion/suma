@@ -48,7 +48,7 @@ defmodule FusionWeb.CompareLive.Home do
   defp default_completion_opts() do
     %{
       model_name: "llama3.2:latest",
-      user_prompt: "What is the best type of Triangle?",
+      user_prompt: "What animals are llamas related to?",
       system_prompt: RAG.default_system_prompt()
     }
   end

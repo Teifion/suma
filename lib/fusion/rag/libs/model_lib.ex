@@ -208,4 +208,46 @@ defmodule Fusion.RAG.ModelLib do
   def change_model(%Model{} = model, attrs \\ %{}) do
     Model.changeset(model, attrs)
   end
+
+
+  @doc false
+  @spec get_model_server_pid() :: pid() | nil
+  def get_model_server_pid() do
+    case Registry.lookup(Fusion.LocalGeneralRegistry, "ModelServer") do
+      [{pid, _}] -> pid
+      _ -> nil
+    end
+  end
+
+  @doc false
+  @spec cast_model_server(any) :: any | nil
+  def cast_model_server(msg) do
+    case get_model_server_pid() do
+      nil ->
+        nil
+
+      pid ->
+        GenServer.cast(pid, msg)
+        :ok
+    end
+  end
+
+  @doc false
+  @spec call_model_server(any) :: any | nil
+  def call_model_server(message) do
+    case get_model_server_pid() do
+      nil ->
+        nil
+
+      pid ->
+        try do
+          GenServer.call(pid, message)
+
+          # If the process has somehow died, we just return nil
+        catch
+          :exit, _ ->
+            nil
+        end
+    end
+  end
 end

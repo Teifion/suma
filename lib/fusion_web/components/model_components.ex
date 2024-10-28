@@ -56,8 +56,9 @@ defmodule FusionWeb.ModelComponents do
         >
           Edit
         </.section_menu_button_url>
+
+        <%= render_slot(@inner_block) %>
       </div>
-      <%= render_slot(@inner_block) %>
     </div>
     """
   end

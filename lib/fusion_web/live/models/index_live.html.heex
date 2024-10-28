@@ -1,17 +1,26 @@
 <div id="index-live-wrapper">
-  <FusionWeb.ModelComponents.filter_bar current_user={@current_user} active="list" />
+  <FusionWeb.ModelComponents.filter_bar current_user={@current_user} active="list">
+    <.section_menu_button
+      phx-click="refresh-list"
+      colour="info"
+      icon="sync"
+      url="#"
+    >
+      Refresh
+    </.section_menu_button>
+  </FusionWeb.ModelComponents.filter_bar>
 
   <.table id="models" rows={@models} table_class="table-sm table-hover">
     <:col :let={model} label="Name"><%= model.name %></:col>
     <:col :let={model} label="Active?">
-      <.check_or_cross value={model.active?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.active?} true="check" false="cross" style="solid" />
     </:col>
     
     <:col :let={model} label="Installed?">
-      <.check_or_cross value={model.installed?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.installed?} true="check" false="cross" style="solid" />
     </:col>
     <:col :let={model} label="Enabled?">
-      <.check_or_cross value={model.enabled?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.enabled?} true="check" false="cross" style="solid" />
     </:col>
     
     <:action :let={model}>

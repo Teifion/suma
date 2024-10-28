@@ -11,7 +11,7 @@ defmodule Fusion.RAG.ModelServer do
   use GenServer
   defmodule State do
     @moduledoc false
-    defstruct ~w(client lookup_ref)a
+    defstruct ~w(client lookup_ref topic)a
   end
 
   @lookup_frequency_ms 30_000
@@ -24,7 +24,39 @@ defmodule Fusion.RAG.ModelServer do
     GenServer.cast(__MODULE__, {:uninstall_model, name})
   end
 
+  def refresh_list() do
+    GenServer.cast(__MODULE__, :refresh_list)
+  end
+
   @impl true
+  def handle_info(:lookup_check, %State{} = state) do
+    state = update_model_list(state)
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast(:refresh_list, %State{} = state) do
+    state = update_model_list(state)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:install_model, name}, %State{} = state) do
+    Ollama.pull_model(state.client, name: name, stream: true)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:delete_model, name}, %State{} = state) do
+    Ollama.delete_model(state.client, name: name)
+    |> IO.inspect
+
+    state
+    # |> update_model_list
+    |> noreply
+  end
+
   # At time of writing the structure of the model data was:
   # %{
   #   "details" => %{
@@ -41,8 +73,7 @@ defmodule Fusion.RAG.ModelServer do
   #   "name" => "qwen2.5:14b",
   #   "size" => 8988124069
   # }
-
-  def handle_info(:lookup_check, %State{} = state) do
+  defp update_model_list(state) do
     ollama_models = Ollama.list_models(state.client)
       |> elem(1)
       |> Map.get("models")
@@ -53,11 +84,11 @@ defmodule Fusion.RAG.ModelServer do
       |> Enum.map(& &1.name)
 
     # Models missing from the DB but existing in Ollama, we need to add them
-    ollama_models
+    new_models = ollama_models
       |> Enum.reject(fn %{"model" => name} ->
         Enum.member?(existing_names, name)
       end)
-      |> Enum.each(fn data ->
+      |> Enum.map(fn data ->
         {:ok, modified_at, _utc_offset} = DateTime.from_iso8601(data["modified_at"])
         modified_at = DateTime.truncate(modified_at, :second)
 
@@ -76,32 +107,24 @@ defmodule Fusion.RAG.ModelServer do
     ollama_names = ollama_models
       |> Enum.map(fn %{"model" => name} -> name end)
 
-    existing_models
+    uninstalled_models = existing_models
       |> Enum.reject(fn model ->
         Enum.member?(ollama_names, model.name)
       end)
-      |> Enum.each(fn model ->
+      |> Enum.map(fn model ->
         {:ok, _model} = ModelLib.update_model(model, %{
           installed?: false,
           active?: false
         })
       end)
 
-    {:noreply, state}
-  end
+    if Enum.any?(new_models) || Enum.any?(uninstalled_models) do
+      Fusion.broadcast(state.topic, %{
+        event: :list_updated
+      })
+    end
 
-  @impl true
-  def handle_cast({:install_model, name}, %State{} = state) do
-    Ollama.pull_model(state.client, name: name, stream: true)
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:uninstall_model, name}, %State{} = state) do
-    Ollama.delete_model(state.client, name: name)
-
-    send(self(), :lookup_check)
-    {:noreply, state}
+    state
   end
 
   @doc false
@@ -117,7 +140,14 @@ defmodule Fusion.RAG.ModelServer do
 
     send(self(), :lookup_check)
 
+    Registry.register(
+      Fusion.LocalGeneralRegistry,
+      "ModelServer",
+      "ModelServer"
+    )
+
     state = %State{
+      topic: "Fusion.Models",
       lookup_ref: lookup_ref,
       client: Ollama.init()
     }

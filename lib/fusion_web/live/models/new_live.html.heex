@@ -1,11 +1,15 @@
 <div :if={assigns[:models]}>
   <form action="#" method="get" class="" phx-submit="form-get-model">
     <div class="row">
-      <label for="control_id" class="control-label">Select model</label>
-      <.input id="model-select" type="text" name="model_name" value={} autofocus="autofocus" />
+      <a href="https://ollama.com/library">https://ollama.com/library</a>
+      <br />
+    
+      <label for="control_id" class="control-label">Model name</label>
+      <.input id="model-select" type="text" name="model_name" value="qwen2.5:0.5b" autofocus="autofocus" />
+      <%!-- qwen2.5:0.5b --%>
     </div>
 
-    <button type="submit" class={"btn btn-primary float-end"}>
+    <button type="submit" class={"btn btn-primary"}>
       Get model
     </button>
   </form>

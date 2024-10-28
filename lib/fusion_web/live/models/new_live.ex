@@ -18,14 +18,16 @@ defmodule FusionWeb.Models.NewLive do
       |> assign(:popular_models, popular_models)
       |> assign(:site_menu_active, "models")
       |> assign(:models, models)
-      |> assign(:state, :waiting)
+      |> assign(:progress, nil)
+      |> assign(:current_request, nil)
       |> ok
   end
 
   def mount(_params, _session, socket) do
     socket
     |> assign(:site_menu_active, "models")
-      |> assign(:state, :loading)
+    |> assign(:progress, nil)
+    |> assign(:current_request, nil)
     |> ok
   end
 
@@ -43,10 +45,60 @@ defmodule FusionWeb.Models.NewLive do
     |> noreply
   end
 
-  defp do_get_model(socket, model_name) do
-    # Now to make it actually pull the model down!
+  def handle_info({_request_pid, {:data, _data}} = message, socket) do
+    pid = socket.assigns.current_request.pid
+
+    case message do
+      {^pid, {:data, %{"status" => "pulling manifest"} = data}} ->
+        socket
+        |> assign(:progress, "pulling manifest")
+
+      {^pid, {:data, %{"status" => "verifying sha256 digest"} = data}} ->
+        socket
+        |> assign(:progress, "verifying sha256 digest")
+
+      {^pid, {:data, %{"status" => "writing manifest"} = data}} ->
+        socket
+        |> assign(:progress, "writing manifest")
+
+      {^pid, {:data, %{"status" => "writing manifest"} = data}} ->
+        socket
+        |> assign(:progress, "removing any unused layers")
+
+      {^pid, {:data, %{"status" => "success"} = data}} ->
+        socket
+        |> assign(:progress, "success")
+
+      # {^pid, {:data, %{"done" => true} = data}} ->
+      #   IO.puts "DONE - true"
+      #   # handle the final streaming chunk
+      #   socket
+
+      {_pid, {:data, data}} ->
+        IO.puts "Unexpected message: #{inspect(data, pretty: true)}"
+        # this message was not expected!
+        socket
+    end
+    |> noreply
+  end
+
+  def handle_info({ref, {:ok, %Req.Response{status: 200}}}, socket) do
+    Process.demonitor(ref, [:flush])
 
     socket
-    |> assign(:state, :downloading)
+    |> assign(:current_request, nil)
+    |> noreply
+  end
+
+  defp do_get_model(socket, model_name) do
+    model_name = model_name
+      |> String.trim()
+
+    # Now to make it actually pull the model down!
+    {:ok, task} = Ollama.pull_model(Ollama.init(), name: model_name, stream: self())
+
+    socket
+    |> assign(:current_request, task)
+    |> assign(:progress, "building request")
   end
 end

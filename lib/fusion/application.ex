@@ -26,12 +26,13 @@ defmodule Fusion.Application do
       # Start a worker by calling: Fusion.Worker.start_link(arg)
       # {Fusion.Worker, arg}
 
-      Fusion.CacheClusterServer,
-      Fusion.RAG.ModelServer,
-
       # Sups and Registries
       {DynamicSupervisor, strategy: :one_for_one, name: Fusion.ComparisonSupervisor},
       {Registry, [keys: :unique, members: :auto, name: Fusion.LocalComparisonRegistry]},
+      {Registry, [keys: :unique, members: :auto, name: Fusion.LocalGeneralRegistry]},
+
+      Fusion.CacheClusterServer,
+      Fusion.RAG.ModelServer,
 
       # Caches
       add_cache(:user_token_identifier_cache, ttl: :timer.minutes(5)),

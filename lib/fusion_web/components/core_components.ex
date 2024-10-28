@@ -623,14 +623,14 @@ defmodule FusionWeb.CoreComponents do
   Renders an icon if true vs false
   ## Examples
 
-  <.check_or_cross value={some_bool} true="check" false="cross" coloured={true} />
+  <.boolean_icon value={some_bool} true="check" false="cross" coloured={true} />
   """
   attr :value, :boolean, required: true
   attr :true, :string, default: "check"
   attr :false, :string, default: "cross"
   attr :coloured, :boolean, default: true
   attr :rest, :global, doc: "arbitrary items to pass to Fontawesome.icon"
-  def check_or_cross(assigns) do
+  def boolean_icon(assigns) do
     colour_class = if assigns[:coloured] do
       if assigns[:value], do: " text-success", else: " text-danger"
     end
@@ -639,7 +639,7 @@ defmodule FusionWeb.CoreComponents do
       |> assign(:colour_class, colour_class)
 
     ~H"""
-    <Fontawesome.icon icon={if @value == true, do: "check", else: "cross"} style={@rest[:style] || "regular"} class={[@rest[:style], @colour_class]} />
+    <Fontawesome.icon icon={if @value == true, do: "check", else: "times"} style={@rest[:style] || "regular"} class={[@rest[:style], @colour_class]} />
     """
   end
 

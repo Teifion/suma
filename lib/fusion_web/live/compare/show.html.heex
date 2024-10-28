@@ -8,6 +8,7 @@
     completion={@completion}
     title="LLM Options"
     model_names={@model_names}
+    key_difference={assigns[:key_difference]}
     action={:edit}
   />
 </div>
@@ -48,15 +49,15 @@
     <form action="#" method="get" phx-submit="add-variable">
       <%
         key_type = cond do
-          Enum.member?(~w(model)a, @key_difference) -> :model
+          Enum.member?(~w(model_name)a, @key_difference) -> :model_name
           true -> :generic
         end
       %>
 
-      <div class="row" :if={key_type == :model}>
+      <div class="row" :if={key_type == :model_name}>
         <div class="col">
           <label for="control_id" class="control-label">Model</label>
-          <.input id="new-variable-model" type="select" name="variable-value" options={["llama3.2"]} value={""} />
+          <.input id="new-variable-model" type="select" name="variable-value" options={@model_names |> Enum.reject(fn n -> Enum.member?(@variables, n) end)} value={""} />
         </div>
       </div>
 
