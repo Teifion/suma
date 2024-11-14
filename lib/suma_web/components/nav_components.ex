@@ -52,7 +52,7 @@ defmodule SumaWeb.NavComponents do
           <!-- Navbar brand -->
           <a class="navbar-brand mt-2 mt-lg-0" href="/">
             <i
-              class={"fa-fw #{Application.get_env(:suma,Sumaty)[:site_icon]}"}
+              class={"fa-fw #{Application.get_env(:suma, Sumaty)[:site_icon]}"}
               style="margin: -4px 20px 0 0px;"
             >
             </i>
@@ -71,9 +71,9 @@ defmodule SumaWeb.NavComponents do
             />
 
             <.top_nav_item
-              text="Embeds"
-              active={@active == "embeds"}
-              route={~p"/embeds"}
+              text="Contents"
+              active={@active == "contents"}
+              route={~p"/contents"}
             />
 
 

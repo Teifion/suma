@@ -1,14 +1,14 @@
-defmodule SumaWeb.EmbedComponents do
+defmodule SumaWeb.ContentComponents do
   @moduledoc false
   use SumaWeb, :component
   import SumaWeb.{NavComponents}
 
   @doc """
-  <SumaWeb.EmbedComponents.filter_bar active="active" />
+  <SumaWeb.ContentComponents.filter_bar active="active" />
 
-  <SumaWeb.EmbedComponents.filter_bar active="active">
+  <SumaWeb.ContentComponents.filter_bar active="active">
     Right side content here
-  </SumaWeb.EmbedComponents.filter_bar>
+  </SumaWeb.ContentComponents.filter_bar>
   """
   attr :selected, :string, default: "list"
   attr :current_user, :map, required: true
@@ -22,7 +22,7 @@ defmodule SumaWeb.EmbedComponents do
           colour="info"
           icon={StylingHelper.icon(:list)}
           active={@selected == "list"}
-          url={~p"/embeds"}
+          url={~p"/contents"}
         >
           List
         </.section_menu_button_url>
@@ -32,7 +32,7 @@ defmodule SumaWeb.EmbedComponents do
           colour="info"
           icon={StylingHelper.icon(:new)}
           active={@selected == "new"}
-          url={~p"/embeds/new"}
+          url={~p"/contents/new"}
         >
           New
         </.section_menu_button_url>

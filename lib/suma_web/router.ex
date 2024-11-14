@@ -64,15 +64,16 @@ defmodule SumaWeb.Router do
     end
   end
 
-  scope "/embeds", SumaWeb.Embeds do
+  scope "/contents", SumaWeb.Contents do
     pipe_through [:browser]
 
-    live_session :user_embeds,
+    live_session :user_contents,
       on_mount: [
         {SumaWeb.UserAuth, :ensure_authenticated},
         # {SumaWeb.UserAuth, {:authorise, ~w(admin)}}
       ] do
       live "/", IndexLive
+      live "/new", NewLive
       live "/:id", ShowLive
     end
   end
@@ -145,6 +146,7 @@ defmodule SumaWeb.Router do
   scope "/", SumaWeb do
     pipe_through [:browser]
 
+    post "/logout", UserSessionController, :delete
     delete "/logout", UserSessionController, :delete
 
     live_session :current_user,

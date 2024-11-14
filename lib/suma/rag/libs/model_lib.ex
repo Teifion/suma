@@ -51,6 +51,23 @@ defmodule Suma.RAG.ModelLib do
     |> Repo.all()
   end
 
+
+  @doc """
+
+  """
+  @spec list_model_embeds_for_content(Suma.Content.id()) :: [Model.t()]
+  def list_model_embeds_for_content(content_id) do
+    ModelQueries.model_query(
+      where: [
+        active?: true
+      ],
+      preload: [
+        {:embeds, content_id}
+      ]
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Returns the list of models.
 

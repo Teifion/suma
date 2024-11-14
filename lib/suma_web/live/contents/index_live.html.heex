@@ -1,11 +1,12 @@
 <div id="index-live-wrapper">
-  <SumaWeb.EmbedComponents.filter_bar current_user={@current_user} active="list" />
+  <SumaWeb.ContentComponents.filter_bar current_user={@current_user} active="list" />
 
   <.table id="contents" rows={@contents} table_class="table-sm table-hover">
     <:col :let={content} label="Name"><%= content.name %></:col>
+    <:col :let={content} label="Size"><%= String.length(content.text) |> format_number %></:col>
     
     <:action :let={content}>
-      <.link navigate={~p"/embeds/#{content.name}"} class="btn btn-secondary btn-sm">
+      <.link navigate={~p"/contents/#{content.id}"} class="btn btn-secondary btn-sm">
         Show
       </.link>
     </:action>

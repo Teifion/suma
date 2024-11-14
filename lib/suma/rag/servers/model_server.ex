@@ -1,6 +1,6 @@
 defmodule Suma.RAG.ModelServer do
   @moduledoc """
-  The GenServer used to track the state of an ongoing comparison
+  The GenServer used to interface with the Ollama server.
   """
 
   use SumaWeb, :server
@@ -16,19 +16,56 @@ defmodule Suma.RAG.ModelServer do
 
   @lookup_frequency_ms 30_000
 
+  defp get_pid() do
+    case Registry.lookup(Suma.LocalGeneralRegistry, "ModelServer") do
+      [{pid, _}] -> pid
+      _ -> nil
+    end
+  end
+
   def install_model(name) do
-    GenServer.cast(__MODULE__, {:install_model, name})
+    GenServer.cast(get_pid(), {:install_model, name})
   end
 
   def uninstall_model(name) do
-    GenServer.cast(__MODULE__, {:uninstall_model, name})
+    GenServer.cast(get_pid(), {:uninstall_model, name})
   end
 
   def refresh_list() do
-    GenServer.cast(__MODULE__, :refresh_list)
+    GenServer.cast(get_pid(), :refresh_list)
+  end
+
+  def generate_embed(%Suma.RAG.Model{id: _} = model, %Suma.RAG.Content{id: _} = content) do
+    GenServer.cast(get_pid(), {:generate_embed, model, content})
   end
 
   @impl true
+  @impl true
+  def handle_info({:DOWN, _ref, :process, _pid, :normal}, state) do
+    state
+    |> noreply
+  end
+
+  def handle_info({ref, {:new_embed, result}}, state) do
+    # new_contents = Map.put(state.contents, key, result)
+
+    # state = state
+    # |> struct(%{contents: new_contents})
+
+    # variables
+    # |> Enum.each(fn v ->
+    #   get_response(state, v)
+    # end)
+
+    IO.puts ""
+    IO.inspect result, label: "#{__MODULE__}:#{__ENV__.line}"
+    IO.puts ""
+
+    state
+    |> noreply
+  end
+
+
   def handle_info(:lookup_check, %State{} = state) do
     state = update_model_list(state)
 
@@ -54,6 +91,17 @@ defmodule Suma.RAG.ModelServer do
 
     state
     # |> update_model_list
+    |> noreply
+  end
+
+  def handle_cast({:generate_embed, model, content}, %State{} = state) do
+    Task.async(fn ->
+      r = Suma.generate_model_embed_for_content(model, content)
+
+      {:new_embed, r}
+    end)
+
+    state
     |> noreply
   end
 

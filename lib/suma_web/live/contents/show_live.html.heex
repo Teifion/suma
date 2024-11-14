@@ -1,0 +1,38 @@
+<div id="show-live-wrapper">
+  <SumaWeb.ContentComponents.filter_bar current_user={@current_user} active="show" />
+  
+  <div :if={assigns[:edit_mode] != true && assigns[:content]} class="row mt-4">
+    <div class="col-md-6">
+      <.card>
+        <div class="float-end">
+          <a class="btn btn-info" href={~p"/contents/edit/#{@content.id}"}>
+            <Fontawesome.icon icon={StylingHelper.icon(:edit)} style="solid" /> Edit
+          </a>
+        </div>
+
+        
+
+        <h4 class="d-inline-block">
+          <%= @content.name %>
+        </h4>
+      </.card>
+    </div>
+    
+    <div class="col-md-6">
+      <.card>
+        <.table id="models" rows={@models} table_class="table-sm table-hover">
+          <:col :let={model} label="Name"><%= model.name %></:col>
+          <:col :let={model} label="Embed?">
+            <.boolean_icon value={!Enum.empty?(model.embeds)} true="check" false={if Enum.member?(@updating, model.id), do: "sync fa-spin", else: "times"} style="solid" />
+          </:col>
+
+          <:col :let={model}>
+            <span class="btn btn-secondary btn-sm" :if={Enum.empty?(model.embeds)} phx-click="create-embed" phx-value-model_id={model.id}>
+              Create
+            </span>
+          </:col>
+        </.table>
+      </.card>
+    </div>
+  </div>
+</div>

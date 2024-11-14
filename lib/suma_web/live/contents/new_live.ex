@@ -1,4 +1,4 @@
-defmodule SumaWeb.Embeds.NewLive do
+defmodule SumaWeb.Contents.NewLive do
   @moduledoc false
   use SumaWeb, :live_view
 
@@ -16,7 +16,7 @@ defmodule SumaWeb.Embeds.NewLive do
 
     socket
       |> assign(:popular_models, popular_models)
-      |> assign(:site_menu_active, "embeds")
+      |> assign(:site_menu_active, "contents")
       |> assign(:models, models)
       |> assign(:state, :waiting)
       |> ok
@@ -24,7 +24,7 @@ defmodule SumaWeb.Embeds.NewLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:site_menu_active, "embeds")
+    |> assign(:site_menu_active, "contents")
       |> assign(:state, :loading)
     |> ok
   end

@@ -13,14 +13,14 @@
   <.table id="models" rows={@models} table_class="table-sm table-hover">
     <:col :let={model} label="Name"><%= model.name %></:col>
     <:col :let={model} label="Active?">
-      <.boolean_icon value={model.active?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.active?} true="check" false="times" style="solid" />
     </:col>
     
     <:col :let={model} label="Installed?">
-      <.boolean_icon value={model.installed?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.installed?} true="check" false="times" style="solid" />
     </:col>
     <:col :let={model} label="Enabled?">
-      <.boolean_icon value={model.enabled?} true="check" false="cross" style="solid" />
+      <.boolean_icon value={model.enabled?} true="check" false="times" style="solid" />
     </:col>
     
     <:action :let={model}>

@@ -107,8 +107,16 @@ defmodule Suma.RAG.ModelQueries do
 
   def _preload(query, :embeds) do
     from(model in query,
-      left_join: embeds in assoc(model, :embed),
-      preload: [embed: embeds]
+      left_join: embeds in assoc(model, :embeds),
+      preload: [embeds: embeds]
+    )
+  end
+
+  def _preload(query, {:embeds, content_id}) do
+    from(model in query,
+      left_join: embeds in assoc(model, :embeds),
+      on: embeds.content_id == ^content_id,
+      preload: [embeds: embeds]
     )
   end
 end

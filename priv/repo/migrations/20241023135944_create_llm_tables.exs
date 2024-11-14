@@ -38,7 +38,7 @@ defmodule Suma.Repo.Migrations.CreateLLMTables do
     create_if_not_exists table(:rag_embeds, primary_key: false) do
       add(:id, :uuid, primary_key: true, null: false)
       add(:tokens, :integer)
-      add(:vectors, :vector, size: 3072)
+      add(:vectors, :vector, size: 4096)
 
       add(:model_id, references(:rag_models, on_delete: :nothing, type: :uuid), type: :uuid)
       add(:content_id, references(:rag_contents, on_delete: :nothing, type: :uuid), type: :uuid)

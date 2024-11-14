@@ -1,4 +1,4 @@
-defmodule SumaWeb.Embeds.IndexLive do
+defmodule SumaWeb.Contents.IndexLive do
   @moduledoc false
   use SumaWeb, :live_view
 
@@ -7,7 +7,7 @@ defmodule SumaWeb.Embeds.IndexLive do
   @impl true
   def mount(_params, _session, socket) when is_connected?(socket) do
     socket
-    |> assign(:site_menu_active, "embeds")
+    |> assign(:site_menu_active, "contents")
     |> assign(:search_term, "")
     |> get_contents
     |> ok
@@ -16,7 +16,7 @@ defmodule SumaWeb.Embeds.IndexLive do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:site_menu_active, "embeds")
+     |> assign(:site_menu_active, "contents")
      |> assign(:contents, [])}
   end
 

@@ -40,7 +40,7 @@ defmodule Suma.Account.UserLib do
 
   """
   @spec get_user!(Suma.user_id()) :: User.t()
-  @spec get_user!(Suma.user_id(),Sumaty.query_args()) :: User.t()
+  @spec get_user!(Suma.user_id(), Suma.query_args()) :: User.t()
   def get_user!(user_id, query_args \\ []) do
     (query_args ++ [id: user_id])
     |> UserQueries.user_query()
@@ -64,7 +64,7 @@ defmodule Suma.Account.UserLib do
       %User{}
 
   """
-  @spec get_user(Suma.user_id(),Sumaty.query_args()) :: User.t() | nil
+  @spec get_user(Suma.user_id(), Suma.query_args()) :: User.t() | nil
   def get_user(user_id, query_args \\ []) do
     UserQueries.user_query(query_args ++ [id: user_id])
     |> Suma.Repo.one()

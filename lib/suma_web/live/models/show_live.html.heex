@@ -19,12 +19,12 @@
             <tbody>
               <tr>
                 <td><strong>Active?</strong></td>
-                <td><.boolean_icon value={@model.active?} true="check" false="cross" style="solid" /></td>
+                <td><.boolean_icon value={@model.active?} true="check" false="times" style="solid" /></td>
                 <td></td>
               </tr>
               <tr>
                 <td><strong>Enabled?</strong></td>
-                <td><.boolean_icon value={@model.enabled?} true="check" false="cross" style="solid" /></td>
+                <td><.boolean_icon value={@model.enabled?} true="check" false="times" style="solid" /></td>
                 <td :if={@model.enabled?}>
                   <div class="btn btn-sm btn-outline-secondary" phx-click="disable-model" :if={allow?(@current_user, ["admin"])}>
                     Disable
@@ -38,7 +38,7 @@
               </tr>
               <tr>
                 <td><strong>Installed?</strong></td>
-                <td><.boolean_icon value={@model.installed?} true="check" false="cross" style="solid" /></td>
+                <td><.boolean_icon value={@model.installed?} true="check" false="times" style="solid" /></td>
                 <td></td>
               </tr>
             </tbody>

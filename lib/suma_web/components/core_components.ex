@@ -364,8 +364,7 @@ defmodule SumaWeb.CoreComponents do
         id={@id || @name}
         name={@name}
         class={[
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
-          "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
+          "form-control",
           @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
         ]}
         {@rest}
@@ -623,11 +622,11 @@ defmodule SumaWeb.CoreComponents do
   Renders an icon if true vs false
   ## Examples
 
-  <.boolean_icon value={some_bool} true="check" false="cross" coloured={true} />
+  <.boolean_icon value={some_bool} true="check" false="times" coloured={true} />
   """
   attr :value, :boolean, required: true
   attr :true, :string, default: "check"
-  attr :false, :string, default: "cross"
+  attr :false, :string, default: "times"
   attr :coloured, :boolean, default: true
   attr :rest, :global, doc: "arbitrary items to pass to Fontawesome.icon"
   def boolean_icon(assigns) do
@@ -639,7 +638,7 @@ defmodule SumaWeb.CoreComponents do
       |> assign(:colour_class, colour_class)
 
     ~H"""
-    <Fontawesome.icon icon={if @value == true, do: "check", else: "times"} style={@rest[:style] || "regular"} class={[@rest[:style], @colour_class]} />
+    <Fontawesome.icon icon={if @value == true, do: assigns[:true], else: assigns[:false]} style={@rest[:style] || "regular"} class={[@rest[:style], @colour_class]} />
     """
   end
 
@@ -665,9 +664,9 @@ defmodule SumaWeb.CoreComponents do
     # should be written to the errors.po file. The :count option is
     # set by Ecto and indicates we should also apply plural rules.
     if count = opts[:count] do
-      Gettext.dngettext(SumaWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(Suma.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(SumaWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(Suma.Gettext, "errors", msg, opts)
     end
   end
 

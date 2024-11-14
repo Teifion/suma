@@ -130,6 +130,32 @@ defmodule Suma do
     end)
   end
 
+  def generate_model_embed_for_content(%Suma.RAG.Model{id: _} = model, %Suma.RAG.Content{id: _} = content) do
+    client = Ollama.init()
+
+    # Does an embed exist for this already?
+    embed = RAG.EmbedLib.get_model_content_embed(model.id, content.id)
+
+    if embed do
+      raise "Embed already exists"
+    else
+      {:ok, response} = Ollama.embed(client, model: model.name, input: content.text)
+
+      IO.puts ""
+      IO.inspect response, label: "#{__MODULE__}:#{__ENV__.line}"
+      IO.puts ""
+
+      vectors = hd(response["embeddings"])
+
+      {:ok, _} = RAG.EmbedLib.create_embed(%{
+        model_id: model.id,
+        content_id: content.id,
+        tokens: Enum.count(vectors),
+        vectors: vectors
+      })
+    end
+  end
+
   # PubSub delegation
   alias Suma.Helpers.PubSubHelper
 

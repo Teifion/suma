@@ -57,6 +57,16 @@ defmodule Suma.RAG.EmbedLib do
     |> Suma.Repo.all()
   end
 
+  def get_model_content_embed(model_id, content_id) do
+    EmbedQueries.embed_query(
+      where: [
+        model_id: model_id,
+        content_id: content_id
+      ]
+    )
+    |> Suma.Repo.one()
+  end
+
   @doc """
   Gets a single embed.
 
@@ -72,7 +82,7 @@ defmodule Suma.RAG.EmbedLib do
 
   """
   @spec get_embed!(Suma.embed_id()) :: Embed.t()
-  @spec get_embed!(Suma.embed_id(),Sumaty.query_args()) :: Embed.t()
+  @spec get_embed!(Suma.embed_id(), Sumaty.query_args()) :: Embed.t()
   def get_embed!(embed_id, query_args \\ []) do
     (query_args ++ [id: embed_id])
     |> EmbedQueries.embed_query()
@@ -96,7 +106,7 @@ defmodule Suma.RAG.EmbedLib do
       %Embed{}
 
   """
-  @spec get_embed(Suma.embed_id(),Sumaty.query_args()) :: Embed.t() | nil
+  @spec get_embed(Suma.embed_id(), Sumaty.query_args()) :: Embed.t() | nil
   def get_embed(embed_id, query_args \\ []) do
     EmbedQueries.embed_query(query_args ++ [id: embed_id])
     |> Suma.Repo.one()

@@ -102,7 +102,6 @@ defmodule SumaWeb do
       import SumaWeb.CoreComponents
 
       alias Suma.Helper.StylingHelper
-      import Suma.Helper.StringHelper, only: [format_number: 1]
       import Suma.Account.AuthLib, only: [allow?: 2, allow_any?: 2]
       unquote(html_helpers())
     end
@@ -113,7 +112,6 @@ defmodule SumaWeb do
       use Phoenix.LiveComponent
 
       alias Suma.Helper.StylingHelper
-      import Suma.Helper.StringHelper, only: [format_number: 1]
 
       import Suma.Account.AuthLib, only: [allow?: 2, allow_any?: 2]
 
@@ -142,6 +140,8 @@ defmodule SumaWeb do
       # Core UI components and translation
       import SumaWeb.{CoreComponents, NavComponents, BootstrapComponents}
       use Gettext, backend: Suma.Gettext
+
+      import Suma.Helper.StringHelper, only: [format_number: 1]
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

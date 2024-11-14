@@ -357,6 +357,15 @@ defmodule Suma.RAG.ComparisonServer do
     })
   end
 
+  defp request_new_contents(%{key_difference: diff} = state) do
+
+    IO.puts ""
+    IO.inspect "No handler for diff type of #{diff}", label: "#{__MODULE__}:#{__ENV__.line}"
+    IO.puts ""
+
+    state
+  end
+
   defp request_new_content(user_prompt, model, variables) do
     Task.async(fn ->
       embed = EmbedLib.get_nearest_embed(user_prompt, model, Ollama.init())

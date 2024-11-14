@@ -1,0 +1,19 @@
+<div id="new-live-wrapper">
+  <SumaWeb.ContentComponents.filter_bar current_user={@current_user} active="new" />
+
+  <div class="row mt-4">
+    <div class="col">
+      <.live_component
+        module={SumaWeb.RAG.ContentFormComponent}
+        id={:new}
+        action={:new}
+        content={%Suma.RAG.Content{}}
+        patch={~p"/contents"}
+        title="New content"
+        current_user={@current_user}
+      />
+    </div>
+  </div>
+
+
+</div>
